@@ -15,14 +15,21 @@ export default defineConfig({
           "node_modules/coi-serviceworker/coi-serviceworker.js",
           "dist/coi-serviceworker.js"
         );
-        esbuild.buildSync({
-          entryPoints: [
-            "node_modules/monaco-editor/esm/vs/editor/editor.worker.js",
-          ],
+        let common: esbuild.BuildOptions = {
           format: "iife",
           outdir: "dist",
           bundle: true,
           minify: true,
+        };
+        esbuild.buildSync({
+          entryPoints: [
+            "node_modules/monaco-editor/esm/vs/editor/editor.worker.js",
+          ],
+          ...common,
+        });
+        esbuild.buildSync({
+          entryPoints: ["src/vumeter-worklet.js"],
+          ...common,
         });
       },
     },

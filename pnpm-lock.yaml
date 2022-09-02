@@ -3,6 +3,7 @@ lockfileVersion: 5.4
 specifiers:
   '@surma/rollup-plugin-off-main-thread': ^2.2.3
   '@types/file-saver': ^2.0.5
+  '@types/lodash': ^4.14.184
   '@types/node': ^18.7.14
   '@types/react': ^18.0.17
   '@types/react-dom': ^18.0.6
@@ -11,7 +12,9 @@ specifiers:
   coi-serviceworker: ^0.1.6
   esbuild: ^0.15.6
   file-saver: ^2.0.5
+  lodash: ^4.17.21
   monaco-editor: ^0.34.0
+  normalize.css: ^8.0.1
   react: ^18.2.0
   react-dom: ^18.2.0
   sass: ^1.54.8
@@ -25,6 +28,7 @@ dependencies:
 devDependencies:
   '@surma/rollup-plugin-off-main-thread': 2.2.3
   '@types/file-saver': 2.0.5
+  '@types/lodash': 4.14.184
   '@types/node': 18.7.14
   '@types/react': 18.0.18
   '@types/react-dom': 18.0.6
@@ -33,7 +37,9 @@ devDependencies:
   coi-serviceworker: 0.1.6
   esbuild: 0.15.6
   file-saver: 2.0.5
+  lodash: 4.17.21
   monaco-editor: 0.34.0
+  normalize.css: 8.0.1
   sass: 1.54.8
   typescript: 4.8.2
   vite: 3.0.9_sass@1.54.8
@@ -374,6 +380,10 @@ packages:
 
   /@types/file-saver/2.0.5:
     resolution: {integrity: sha512-zv9kNf3keYegP5oThGLaPk8E081DFDuwfqjtiTzm6PoxChdJ1raSuADf2YGCVIyrSynLrgc8JWv296s7Q7pQSQ==}
+    dev: true
+
+  /@types/lodash/4.14.184:
+    resolution: {integrity: sha512-RoZphVtHbxPZizt4IcILciSWiC6dcn+eZ8oX9IWEYfDMcocdd42f7NPI6fQj+6zI8y4E0L7gu2pcZKLGTRaV9Q==}
     dev: true
 
   /@types/node/18.7.14:
@@ -1326,6 +1336,10 @@ packages:
     hasBin: true
     dev: true
 
+  /lodash/4.17.21:
+    resolution: {integrity: sha512-v2kDEe57lecTulaDIuNTPy3Ry4gLGJ6Z1O3vE1krgXZNrsQ+LFTGHVxVjcXPs17LhbZVGedAJv8XZ1tvj5FvSg==}
+    dev: true
+
   /loose-envify/1.4.0:
     resolution: {integrity: sha512-lyuxPGr/Wfhrlem2CL/UcnUc1zcqKAImBDzukY7Y5F/yQiNdko6+fRLevlw1HgMySw7f611UIY408EtxRSoK3Q==}
     hasBin: true
@@ -1380,6 +1394,10 @@ packages:
   /normalize-path/3.0.0:
     resolution: {integrity: sha512-6eZs5Ls3WtCisHWp9S2GUy8dqkpGi4BVSz3GaqiE6ezub0512ESztXUwUB6C6IKbQkY2Pnb/mD4WYojCRwcwLA==}
     engines: {node: '>=0.10.0'}
+    dev: true
+
+  /normalize.css/8.0.1:
+    resolution: {integrity: sha512-qizSNPO93t1YUuUhP22btGOo3chcvDFqFaj2TRybP0DMxkHOCTYwp3n34fel4a31ORXy4m1Xq0Gyqpb5m33qIg==}
     dev: true
 
   /object-inspect/1.12.2:
