@@ -6,7 +6,13 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - run: npm install -g pnpm
+      - uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+          target: wasm32-unknown-unknown
+          profile: minimal
+      - run: ./setup-wasm.sh
+      - run: npm install -g pnpm      
       - run: pnpm build
       - uses: peaceiris/actions-gh-pages@v3
         with:
