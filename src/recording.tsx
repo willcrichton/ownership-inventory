@@ -195,7 +195,7 @@ export let Outro = ({ recorder }: { recorder: MediaRecorder }) => {
       xhr.addEventListener("loadend", () => {
         setUploaded(true);
       });
-      xhr.open("POST", "http://localhost:5001/upload");
+      xhr.open("POST", "https://mindover.computer/upload");
       xhr.send(formData);
     });
     recorder.stop();
