@@ -11,7 +11,6 @@ jobs:
           toolchain: stable
           target: wasm32-unknown-unknown
           profile: minimal
-          components: rust-src
       - uses: jetli/wasm-pack-action@v0.3.0
       - run: ./setup-wasm.sh
       - run: | 
