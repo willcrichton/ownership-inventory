@@ -1,4 +1,3 @@
-cargo install wasm-pack
 git clone https://github.com/rust-analyzer/rust-analyzer-wasm
 pushd rust-analyzer-wasm
 cd rust-pack
