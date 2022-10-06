@@ -1,0 +1,1 @@
+import i,{initThreadPool as n,WorldState as c}from"./wasm_demo.ad3ea2b3.js";import"./workerHelpers.3c2df349.js";const d=async()=>{await i(),await n(navigator.hardwareConcurrency);const t=new c;onmessage=a=>{const{which:r,args:s,id:e}=a.data,o=t[r](...s);postMessage({id:e,result:o})}};d().then(()=>{postMessage({id:"ra-worker-ready"})});
