@@ -10,7 +10,8 @@ export default defineConfig({
     OMT(),
     react(),
     {
-      buildEnd() {
+      name: "No",
+      closeBundle() {
         fs.copyFileSync(
           "node_modules/coi-serviceworker/coi-serviceworker.js",
           "dist/coi-serviceworker.js"

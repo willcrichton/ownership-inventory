@@ -340,5 +340,5 @@ export let Editor: React.FC<{
     return dipose.dispose;
   }, [ra, model]);
 
-  return <div className="editor" ref={ref} style={{ height: "300px" }} />;
+  return <div className="editor" ref={ref} style={{ height: "500px" }} />;
 };

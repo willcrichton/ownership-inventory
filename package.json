@@ -25,6 +25,8 @@
     "esbuild": "^0.15.6",
     "file-saver": "^2.0.5",
     "lodash": "^4.17.21",
+    "mobx": "^6.6.2",
+    "mobx-react": "^7.5.3",
     "monaco-editor": "^0.34.0",
     "normalize.css": "^8.0.1",
     "sass": "^1.54.8",
