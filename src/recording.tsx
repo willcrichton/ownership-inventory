@@ -162,34 +162,67 @@ export let RecordingSetup = ({
 };
 
 export let Outro = ({ recorder }: { recorder: MediaRecorder }) => {
+  let [uploaded, setUploaded] = useState(false);
   useEffect(() => {
     recorder.addEventListener("dataavailable", (e) => {
-      if (e.data.size > 0) {
-        let mime = e.data.type.split(";")[0];
-        console.log("Mime type", mime, e.data.type);
-        let exts: { [k: string]: string } = {
-          "video/x-matroska": "mkv",
-          "video/mp4": "mp4",
-        };
-        let ext = exts[mime] || "unk";
-        let url = URL.createObjectURL(e.data);
-        let a = document.createElement("a");
-        a.href = url;
-        a.download = `recording.${ext}`;
-        a.click();
-        URL.revokeObjectURL(url);
-      }
+      if (e.data.size == 0) return;
+
+      let mime = e.data.type.split(";")[0];
+      let exts: { [k: string]: string } = {
+        "video/x-matroska": "mkv",
+        "video/mp4": "mp4",
+      };
+      let ext = exts[mime] || "unk";
+
+      let now = new Date();
+      let date = [now.getFullYear(), now.getMonth(), now.getDate()]
+        .map((n) => n.toString().padStart(2, "0"))
+        .join("-");
+
+      let nonce = _.range(6)
+        .map(() => Math.floor(Math.random() * 16).toString(16))
+        .join("");
+
+      let formData = new FormData();
+      formData.append(`recording_${date}_${nonce}.${ext}`, e.data);
+
+      let xhr = new XMLHttpRequest();
+      xhr.upload.addEventListener("progress", (event) => {
+        if (event.lengthComputable) {
+          console.log("upload progress:", event.loaded / event.total);
+        }
+      });
+      xhr.addEventListener("loadend", () => {
+        setUploaded(true);
+      });
+      xhr.open("POST", "http://localhost:5001/upload");
+      xhr.send(formData);
     });
     recorder.stop();
     recorder.stream.getTracks().forEach((track) => track.stop());
-  });
+  }, []);
   return (
     <div className="container">
       <p>
         Thank you for your participation in the experiment! We have stopped
         recording your screen and audio.
       </p>
-      <p className="warning">TODO: this will send the data to the server</p>
+      {uploaded ? (
+        <p>
+          The recording has been successfully uploaded. You may now close this
+          tab.
+        </p>
+      ) : (
+        <>
+          <p>
+            <strong style={{ fontSize: "24px" }}>DO NOT CLOSE THIS TAB!</strong>
+          </p>
+          <p>
+            We are currently uploading the recording to our server. Please wait
+            a minute for the upload to complete...
+          </p>
+        </>
+      )}
     </div>
   );
 };

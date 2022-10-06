@@ -267,6 +267,7 @@ let Intro = ({ next }: { next: () => void }) => {
 let App = () => {
   let [stage, setStage] = useState("start");
   let [recorder, setRecorder] = useState<MediaRecorder | null>(null);
+
   return (
     <>
       <div className="container">
