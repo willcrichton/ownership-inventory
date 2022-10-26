@@ -281,27 +281,27 @@ fn make_separator(user_str: &str) -> &str {
   }
 }
   `,
-  // `
-  // // Gets the string out of an option if it exists,
-  // // returning a default otherwise
-  // fn get_or_default(arg: &Option<String>) -> String {
-  //   if arg.is_none() {
-  //       return String::new();
-  //   }
-  //   let s = arg.unwrap();
-  //   s.clone()
-  // }
-  //   `,
-  // `
-  // // Removes all the zeros in-place from a vector of integers.
-  // fn remove_zeros(v: &mut Vec<i32>) {
-  //   for (t, i) in v.iter().enumerate().rev() {
-  //     if *t == 0 {
-  //       v.remove(i);
-  //     }
-  //   }
-  // }
-  // `,
+  `
+// Gets the string out of an option if it exists,
+// returning a default otherwise
+fn get_or_default(arg: &Option<String>) -> String {
+  if arg.is_none() {
+      return String::new();
+  }
+  let s = arg.unwrap();
+  s.clone()
+}
+    `,
+  `
+// Removes all the zeros in-place from a vector of integers.
+fn remove_zeros(v: &mut Vec<i32>) {
+  for (t, i) in v.iter().enumerate().rev() {
+    if *t == 0 {
+      v.remove(i);
+    }
+  }
+}
+  `,
 ];
 
 let urlParams = new URLSearchParams(window.location.search);

@@ -189,9 +189,8 @@ export let Outro = ({ recorder }: { recorder?: MediaRecorder }) => {
 
       let xhr = new XMLHttpRequest();
       xhr.upload.addEventListener("progress", (event) => {
-        if (event.lengthComputable) {
+        if (event.lengthComputable)
           console.log("upload progress:", event.loaded / event.total);
-        }
       });
       xhr.addEventListener("loadend", () => {
         setUploaded(true);
