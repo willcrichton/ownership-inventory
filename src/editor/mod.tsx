@@ -57,7 +57,7 @@ import React, { useEffect, useRef, useState } from "react";
 import fake_alloc from "./fake_alloc.rs?raw";
 import fake_core from "./fake_core.rs?raw";
 import fake_std from "./fake_std.rs?raw";
-// import './index.css';
+
 import { conf, grammar } from "./rust-grammar";
 
 const MODE_ID = "rust";
@@ -312,19 +312,31 @@ export let Editor: React.FC<{
   ra?: RustAnalyzer;
   contents: string;
   onChange?: (contents: string) => void;
-}> = ({ ra, contents, onChange }) => {
+  disabled?: boolean;
+}> = ({ ra, contents, onChange, disabled }) => {
   let ref = useRef<HTMLDivElement>(null);
-  let [model] = useState(() =>
-    monaco.editor.createModel(contents.trim(), MODE_ID)
-  );
+  let [model] = useState(() => monaco.editor.createModel(contents, MODE_ID));
+  let [editor, setEditor] = useState<
+    monaco.editor.IStandaloneCodeEditor | undefined
+  >(undefined);
 
   useEffect(() => {
-    monaco.editor.create(ref.current!, {
+    let editor = monaco.editor.create(ref.current!, {
       model,
-      minimap: {
-        enabled: false,
-      },
+      minimap: { enabled: false },
+      scrollBeyondLastLine: false,
+      folding: false,
+      lineNumbersMinChars: 2,
+      fontSize: "14px"
     });
+    setEditor(editor);
+
+    let lineHeight = editor.getOption(monaco.editor.EditorOption.lineHeight);
+    let lineCount = model.getLineCount();
+    let height = editor.getTopForLineNumber(lineCount + 1) + lineHeight;
+    ref.current!.style.height = `${height}px`;
+    editor.layout();
+
     if (onChange) {
       let dispose = model.onDidChangeContent(() => {
         onChange!(model.getValue());
@@ -340,5 +352,10 @@ export let Editor: React.FC<{
     return dipose.dispose;
   }, [ra, model]);
 
-  return <div className="editor" ref={ref} style={{ height: "500px" }} />;
+  useEffect(() => {
+    if (!editor) return;
+    editor.updateOptions({ readOnly: disabled });
+  }, [disabled, editor]);
+
+  return <div className="editor" ref={ref} />;
 };

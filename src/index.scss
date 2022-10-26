@@ -34,27 +34,33 @@ video {
 
 .problem {
   display: flex;
-  gap: 1em;
+  $gap: 1em;
+  gap: $gap;
+  flex-wrap: wrap;
 
-  .instructions {
-    width: 500px;
+  > div {
     box-sizing: border-box;
-    display: flex;
-    flex-direction: column;
-    gap: 0.5em;
-
-    h2 {
-      margin-bottom: 0;
-    }
+    padding: 1em;
+    border: 1px solid #ccc;
+    width: calc(50% - $gap);
   }
 
-  .scratchpad {
-    flex: 1;
-    box-sizing: border-box;
+  textarea {
+    width: 100%;
+    min-height: 4em;
+  }
 
-    .editor {
-      border: 1px solid #ccc;
-    }
+  h2 {
+    margin: 0;
+  }
+
+  .editor {
+    margin-block-start: 1em;
+    margin-block-end: 1em;
+  }
+
+  .runnable-editor .output {
+    margin-block-end: 1em;
   }
 }
 
@@ -68,19 +74,12 @@ video {
   }
 }
 
-.evaluator {
-  margin-top: 1em;
+pre {
+  border: 1px solid #ccc;
+  padding: 1em;
+  overflow-x: auto;
 
-  button {
-    margin-bottom: 1em;
-  }
-
-  pre {
-    border: 1px solid #ccc;
-    padding: 1em;
-
-    &.error {
-      color: #b40000;
-    }
+  &.error {
+    color: #b40000;
   }
 }

@@ -2,237 +2,241 @@ import _ from "lodash";
 import spinnerUrl from "./assets/spinner.gif";
 import React, { useEffect, useState } from "react";
 import ReactDOM from "react-dom/client";
-import { observer, useLocalObservable } from "mobx-react";
 import { Editor, RustAnalyzer } from "./editor/mod";
 import { RecordingSetup, Outro } from "./recording";
 import "./index.scss";
 
-interface ProblemState {
-  step: number;
-  contents: string;
-  runner?: () => void;
+interface EvalResult {
+  success: boolean;
+  stdout: string;
+  stderr: string;
 }
-
-let Evaluator = observer(({ state }: { state: ProblemState }) => {
-  let [loading, setLoading] = useState<boolean>(false);
-  let [output, setOutput] = useState<{ result: string; error?: string } | null>(
-    null
-  );
-
-  let run = async () => {
-    var params = {
-      version: "stable",
-      optimize: "0",
-      code: state.contents,
-      edition: "2021",
-    };
-
-    setLoading(true);
-    let response;
-    try {
-      response = await fetch("https://play.rust-lang.org/evaluate.json", {
-        headers: {
-          "Content-Type": "application/json",
-        },
-        method: "POST",
-        mode: "cors",
-        body: JSON.stringify(params),
-      });
-    } catch (e) {
-      console.error("Rust playground failed to respond!", e);
-      setLoading(false);
-      return;
-    }
-
-    let data = await response.json();
-    setLoading(false);
-    setOutput(data);
+let evalRust = async (contents: string): Promise<EvalResult> => {
+  var params = {
+    channel: "stable",
+    mode: "debug",
+    code: contents,
+    edition: "2021",
+    crateType: contents.includes("fn main()") ? "bin" : "lib",
+    backtrace: false,
+    tests: false,
   };
 
-  useEffect(() => {
-    state.runner = run;
-  }, []);
+  let response = await fetch("https://play.rust-lang.org/execute", {
+    headers: {
+      "Content-Type": "application/json",
+    },
+    method: "POST",
+    mode: "cors",
+    body: JSON.stringify(params),
+  });
 
+  return await response.json();
+};
+
+let RunnableEditor = ({
+  ra,
+  initialContents,
+  onChange,
+}: {
+  ra?: RustAnalyzer;
+  initialContents: string;
+  onChange: (s: string) => void;
+}) => {
+  let [state] = useState(() => ({ contents: initialContents }));
+  let [loading, setLoading] = useState(false);
+  let [result, setResult] = useState<EvalResult | undefined>(undefined);
+  let run = async () => {
+    setLoading(true);
+    try {
+      let result = await evalRust(state.contents);
+      setResult(result);
+    } catch (e) {
+      // todo
+    }
+    setLoading(false);
+  };
   return (
-    <div className="evaluator">
-      {state.step == 3 ? (
+    <div className="runnable-editor">
+      <Editor
+        contents={state.contents}
+        onChange={(c) => {
+          state.contents = c;
+          onChange(c);
+        }}
+        ra={ra}
+      />
+      <div className="output">
         <div>
           <button onClick={run}>Run</button>
         </div>
-      ) : null}
-      {loading ? (
-        <div>
+        {loading ? (
           <img src={spinnerUrl} />
-        </div>
-      ) : output ? (
-        <div>
+        ) : result ? (
           <div>
-            {output.error ? (
-              <>Compilation failed with the following error:</>
-            ) : (
-              <>Compilation succeeded, and the stdout of the program was:</>
-            )}
+            <p>
+              {result.success ? (
+                <>Compilation has succeeded. The stdout of the process is:</>
+              ) : (
+                <>Compilation has failed. The stderr of the compiler is:</>
+              )}
+            </p>
+            <pre className={result.success ? "stdout" : "stderr"}>
+              {result.success
+                ? result.stdout == ""
+                  ? "(no stdout)"
+                  : result.stdout
+                : result.stderr}
+            </pre>
           </div>
-          <pre className={output.error ? "error" : "success"}>
-            {output.result}
-          </pre>
-        </div>
-      ) : null}
+        ) : null}
+      </div>
     </div>
   );
-});
+};
 
-let Instructions = observer(
-  ({ next, state }: { state: ProblemState; next: () => void }) => {
-    let shouldShow = (n: number) => ({
-      style: { display: state.step >= n ? "block" : "none" },
-    });
-    return (
-      <div className="instructions">
-        <div>
-          <h2>Part 1</h2>
-          <p>
-            To the right is a Rust function that is rejected by the compiler.{" "}
-            <strong>Determine why the compiler rejects this function.</strong>{" "}
-            Write your answer in the blank under the comment{" "}
-            <code>/* Part 1</code>. Remember to talk aloud as you think.
-          </p>
-          <p>
-            Once you are confident in your answer, or if you absolutely cannot
-            figure it out, then click here:{" "}
-            <button
-              disabled={state.step > 0}
-              onClick={() => {
-                state.runner!();
-                state.step += 1;
-              }}
-            >
-              Next Part
-            </button>
-          </p>
-        </div>
-        <div {...shouldShow(1)}>
-          <h2>Part 2</h2>
-          <p>
-            Now, read the error generated by the compiler.{" "}
-            <strong>
-              Does the error message say what you expected the error would be?
-            </strong>{" "}
-            Or if you couldn't figure it out, does the error message show you
-            the error? Write your answer under <code>/* Part 2</code>, and click
-            here when you are done:{" "}
-            <button
-              disabled={state.step > 1}
-              onClick={() => {
-                state.step += 1;
-              }}
-            >
-              Next Part
-            </button>
-          </p>
-        </div>
-        <div {...shouldShow(2)}>
-          <h2>Part 3</h2>
-          <p>
-            Imagine that the compiler did NOT reject this function.{" "}
-            <strong>
-              Write a program that calls this function which would violate
-              memory safety,
-            </strong>{" "}
-            for example by accessing deallocated memory. Write your answer
-            inside <code>fn main()</code>.
-          </p>
-          <p>
-            Once you are confident in your answer, or if you absolutely cannot
-            figure it out, then click here:{" "}
-            <button
-              disabled={state.step > 2}
-              onClick={() => {
-                state.step += 1;
-              }}
-            >
-              Next Part
-            </button>
-          </p>
-        </div>
-        <div {...shouldShow(3)}>
-          <h2>Part 4</h2>
-          <p>
-            Your final task is to fix this function to pass the compiler while
-            preserving its intent. Write your answer under <code>Part 4</code>.
-            You can change any aspect of the function, including the type
-            signature. Additionally, you can click "Run" to get feedback from
-            the compiler.
-          </p>
-          <p>
-            Once you are confident in your answer, or if you absolutely cannot
-            figure it out, then click here:{" "}
-            <button onClick={next}>Finish Question</button>
-          </p>
-        </div>
-      </div>
-    );
-  }
-);
+interface Answer {
+  errorExplanation: string;
+  messageInterpretation: string;
+  safetyViolation: string;
+  functionFix: string;
+}
 
-let Scratchpad = ({ state }: { state: ProblemState }) => {
+let Problem = ({
+  snippet,
+  next,
+}: {
+  snippet: string;
+  next: (a: Answer) => void;
+}) => {
+  let [step, setStep] = useState(0);
+
+  let [errorMessage, setErrorMessage] = useState<string | undefined>(undefined);
+  useEffect(() => {
+    evalRust(snippet).then((result) => setErrorMessage(result.stderr));
+  });
+
   let [ra, setRa] = useState<RustAnalyzer | undefined>(undefined);
   useEffect(() => {
     RustAnalyzer.load().then(setRa);
   }, []);
 
-  return (
-    <div className="scratchpad">
-      <Editor
-        contents={state.contents}
-        ra={ra}
-        onChange={(s) => (state.contents = s)}
-      />
-      <Evaluator state={state} />
-    </div>
-  );
-};
+  let [answer] = useState<Answer>({
+    errorExplanation: "",
+    messageInterpretation: "",
+    safetyViolation: "",
+    functionFix: "",
+  });
 
-let Problem = ({ next }: { next: () => void }) => {
-  let snippet = `
-// Makes a string to separate lines of text, 
-// returning a default if the provided string is blank
-fn make_separator(user_str: &str) -> &str {
-  if user_str == "" {
-    let default = "=".repeat(10);
-    &default
-  } else {
-    user_str
-  }
-}
-
-/* Part 1
-
-*/
-
-/* Part 2
-
-*/
-
-// Part 3
-fn main() {
-
-}
-
-// Part 4
-fn make_separator_fixed() -> () {
-
-}
-  `;
-  let state = useLocalObservable<ProblemState>(() => ({
-    step: 0,
-    contents: snippet,
-  }));
+  let parts: ((finished: boolean) => React.ReactElement)[] = [
+    (finished) => (
+      <>
+        <p>
+          The following Rust function is rejected by the Rust compiler.{" "}
+          <strong>
+            In 1-2 sentences, explain why the compiler rejects this function.
+          </strong>
+        </p>
+        <Editor
+          disabled={finished}
+          contents={snippet}
+          ra={!finished ? ra : undefined}
+        />
+        <p>
+          <textarea
+            disabled={finished}
+            placeholder={"Write your answer here..."}
+            onChange={(e) => {
+              answer.errorExplanation = e.target.value;
+            }}
+          />
+        </p>
+      </>
+    ),
+    (finished) => (
+      <>
+        <p>
+          Below is the actual error message generated by the Rust compiler.{" "}
+          <strong>
+            Does the error message say what you expected the error would be?
+          </strong>{" "}
+        </p>
+        <pre className="error">{errorMessage || "(loading...)"}</pre>
+        <p>
+          <textarea
+            disabled={finished}
+            placeholder={"Write your answer here..."}
+            onChange={(e) => {
+              answer.messageInterpretation = e.target.value;
+            }}
+          />
+        </p>
+      </>
+    ),
+    (finished) => (
+      <>
+        <p>
+          Assume that the compiler did NOT reject this function.{" "}
+          <strong>
+            Write a program that calls this function which would violate memory
+            safety,
+          </strong>{" "}
+          for example by accessing deallocated memory. You may use pseudocode
+          notation if you are unsure how to express something in correct Rust
+          syntax.
+        </p>
+        <Editor
+          contents={`fn main(){\n\n}`}
+          disabled={finished}
+          ra={!finished ? ra : undefined}
+          onChange={(s) => {
+            answer.safetyViolation = s;
+          }}
+        />
+      </>
+    ),
+    (_) => (
+      <>
+        <p>
+          <strong>
+            Fix this function to pass the compiler while preserving as much of
+            its intent as possible.
+          </strong>{" "}
+          You can change any aspect of the function, including the type
+          signature. You can click "Run" to get feedback from the compiler. You
+          may use the{" "}
+          <a href="https://doc.rust-lang.org/std/" target="_blank">
+            standard library documentation
+          </a>
+          .
+        </p>
+        <RunnableEditor
+          ra={ra}
+          initialContents={snippet}
+          onChange={(s) => {
+            answer.functionFix = s;
+          }}
+        />
+      </>
+    ),
+  ];
 
   return (
     <div className="problem">
-      <Instructions next={next} state={state} />
-      <Scratchpad state={state} />
+      {parts
+        .filter((_p, i) => i <= step)
+        .map((part, i) => (
+          <div key={i}>
+            <h2>Part {i + 1}</h2>
+            <div>{part(step != i)}</div>
+            <button
+              disabled={step != i}
+              onClick={() => (step == 3 ? next(answer) : setStep(step + 1))}
+            >
+              Next
+            </button>
+          </div>
+        ))}
     </div>
   );
 };
@@ -241,7 +245,7 @@ let Intro = ({ next }: { next: () => void }) => {
   return (
     <div className="container">
       <p>
-        This page is a 15-minute experiment by Brown University researchers{" "}
+        This page is a 30-minute experiment by Brown University researchers{" "}
         <a href="https://willcrichton.net/">Will Crichton</a> and{" "}
         <a href="https://cs.brown.edu/~sk/">Shriram Krishnamurthi</a>. You will
         be presented with a series of questions about ownership in Rust.
@@ -264,26 +268,114 @@ let Intro = ({ next }: { next: () => void }) => {
   );
 };
 
+let PROBLEMS = [
+  `
+// Makes a string to separate lines of text, 
+// returning a default if the provided string is blank
+fn make_separator(user_str: &str) -> &str {
+  if user_str == "" {
+    let default = "=".repeat(10);
+    &default
+  } else {
+    user_str
+  }
+}
+  `,
+  // `
+  // // Gets the string out of an option if it exists,
+  // // returning a default otherwise
+  // fn get_or_default(arg: &Option<String>) -> String {
+  //   if arg.is_none() {
+  //       return String::new();
+  //   }
+  //   let s = arg.unwrap();
+  //   s.clone()
+  // }
+  //   `,
+  // `
+  // // Removes all the zeros in-place from a vector of integers.
+  // fn remove_zeros(v: &mut Vec<i32>) {
+  //   for (t, i) in v.iter().enumerate().rev() {
+  //     if *t == 0 {
+  //       v.remove(i);
+  //     }
+  //   }
+  // }
+  // `,
+];
+
+let urlParams = new URLSearchParams(window.location.search);
+
 let App = () => {
-  let [stage, setStage] = useState("start");
-  let [recorder, setRecorder] = useState<MediaRecorder | null>(null);
+  let [stage, setStage] = useState<"start" | "setup" | "problems" | "end">(
+    "start"
+  );
+  let [problem, setProblem] = useState(0);
+  let [recorder, setRecorder] = useState<MediaRecorder | undefined>();
+  let [answers] = useState<any[]>([]);
+
+  useEffect(() => {
+    if (stage != "start" && stage != "end") {
+      window.onbeforeunload = () =>
+        "Are you sure you want to exit the experiment before finishing?";
+      return () => {
+        window.onbeforeunload = null;
+      };
+    }
+  }, [stage]);
+
+  useEffect(() => {
+    if (stage == "end") {
+      fetch("https://mindover.computer/ownership-inventory", {
+        headers: {
+          "Content-Type": "application/json",
+        },
+        method: "POST",
+        mode: "cors",
+        body: JSON.stringify(answers),
+      });
+    }
+  }, [stage]);
 
   return (
     <>
       <div className="container">
-        <h1>Ownership Inventory</h1>
+        <h1>
+          Ownership Inventory{" "}
+          {stage == "problems" ? (
+            <>
+              - Problem {problem + 1}/{PROBLEMS.length}
+            </>
+          ) : null}
+        </h1>
       </div>
       {stage === "start" ? (
-        <Intro next={() => setStage("setup")} />
+        <Intro
+          next={() =>
+            setStage(urlParams.get("record") !== null ? "setup" : "problems")
+          }
+        />
       ) : stage === "setup" ? (
         <RecordingSetup
-          next={() => setStage("problem")}
+          next={() => setStage("problems")}
           registerRecorder={setRecorder}
         />
-      ) : stage == "problem" ? (
-        <Problem next={() => setStage("end")} />
+      ) : stage == "problems" ? (
+        <Problem
+          key={problem}
+          snippet={PROBLEMS[problem].trim()}
+          next={(answer) => {
+            answers.push({
+              question: PROBLEMS[problem],
+              answer,
+            });
+            problem + 1 < PROBLEMS.length
+              ? setProblem(problem + 1)
+              : setStage("end");
+          }}
+        />
       ) : (
-        <Outro recorder={recorder!} />
+        <Outro recorder={recorder} />
       )}
     </>
   );

@@ -161,9 +161,10 @@ export let RecordingSetup = ({
   );
 };
 
-export let Outro = ({ recorder }: { recorder: MediaRecorder }) => {
+export let Outro = ({ recorder }: { recorder?: MediaRecorder }) => {
   let [uploaded, setUploaded] = useState(false);
   useEffect(() => {
+    if (!recorder) return;
     recorder.addEventListener("dataavailable", (e) => {
       if (e.data.size == 0) return;
 
@@ -201,28 +202,35 @@ export let Outro = ({ recorder }: { recorder: MediaRecorder }) => {
     recorder.stop();
     recorder.stream.getTracks().forEach((track) => track.stop());
   }, []);
+
+  // TODO: if upload fails, give option to download and ask them to send it.
+
   return (
     <div className="container">
-      <p>
-        Thank you for your participation in the experiment! We have stopped
-        recording your screen and audio.
-      </p>
-      {uploaded ? (
-        <p>
-          The recording has been successfully uploaded. You may now close this
-          tab.
-        </p>
-      ) : (
+      <p>Thank you for your participation in the experiment!</p>
+      {recorder ? (
         <>
-          <p>
-            <strong style={{ fontSize: "24px" }}>DO NOT CLOSE THIS TAB!</strong>
-          </p>
-          <p>
-            We are currently uploading the recording to our server. Please wait
-            a minute for the upload to complete...
-          </p>
+          <p>We have stopped recording your screen and audio.</p>
+          {uploaded ? (
+            <p>
+              The recording has been successfully uploaded. You may now close
+              this tab.
+            </p>
+          ) : (
+            <>
+              <p>
+                <strong style={{ fontSize: "24px" }}>
+                  DO NOT CLOSE THIS TAB!
+                </strong>
+              </p>
+              <p>
+                We are currently uploading the recording to our server. Please
+                wait a minute for the upload to complete...
+              </p>
+            </>
+          )}
         </>
-      )}
+      ) : null}
     </div>
   );
 };
