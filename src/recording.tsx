@@ -188,6 +188,8 @@ export let Outro = ({ recorder }: { recorder?: MediaRecorder }) => {
       formData.append(`recording_${date}_${nonce}.${ext}`, e.data);
 
       let xhr = new XMLHttpRequest();
+      xhr.setRequestHeader("X-Requested-With", "XMLHttpRequest");
+      xhr.setRequestHeader("Access-Control-Allow-Origin", "*");
       xhr.upload.addEventListener("progress", (event) => {
         if (event.lengthComputable)
           console.log("upload progress:", event.loaded / event.total);
