@@ -138,7 +138,7 @@ let Problem = ({
           </strong>
         </p>
         <Editor
-          disabled={finished}
+          disabled={true}
           contents={snippet}
           ra={!finished ? ra : undefined}
         />
@@ -233,7 +233,7 @@ let Problem = ({
               disabled={step != i}
               onClick={() => (step == 3 ? next(answer) : setStep(step + 1))}
             >
-              Next
+              Submit
             </button>
           </div>
         ))}
@@ -241,21 +241,30 @@ let Problem = ({
   );
 };
 
-let Intro = ({ next }: { next: () => void }) => {
+let Intro = ({
+  recorder,
+  next,
+}: {
+  recorder?: MediaRecorder;
+  next: () => void;
+}) => {
   return (
     <div className="container">
       <p>
         This page is a 30-minute experiment by Brown University researchers{" "}
         <a href="https://willcrichton.net/">Will Crichton</a> and{" "}
         <a href="https://cs.brown.edu/~sk/">Shriram Krishnamurthi</a>. You will
-        be presented with a series of questions about ownership in Rust.
+        be presented with a series of questions about ownership in Rust. Please
+        answer to the best of your ability.
       </p>
-      <p>
-        To help us understand your problem-solving process, this webpage will
-        record your screen and microphone. You will talk aloud as you solve each
-        problem. At the end, the recordings will be securely saved to our
-        server.
-      </p>
+      {recorder ? (
+        <p>
+          To help us understand your problem-solving process, this webpage will
+          record your screen and microphone. You will talk aloud as you solve
+          each problem. At the end, you will upload the recording to our secure
+          server.
+        </p>
+      ) : null}
       <p>
         <button style={{ marginRight: "20px" }} onClick={next}>
           I understand and want to participate
@@ -351,6 +360,7 @@ let App = () => {
       </div>
       {stage === "start" ? (
         <Intro
+          recorder={recorder}
           next={() =>
             setStage(urlParams.get("record") !== null ? "setup" : "problems")
           }
