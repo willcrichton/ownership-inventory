@@ -162,7 +162,8 @@ export let RecordingSetup = ({
 };
 
 export let Outro = ({ recorder }: { recorder?: MediaRecorder }) => {
-  let [uploaded, setUploaded] = useState(false);
+  // let [uploaded, setUploaded] = useState(false);
+  let [urlParams, setUrlParams] = useState<any | undefined>();
   useEffect(() => {
     if (!recorder) return;
     recorder.addEventListener("dataavailable", (e) => {
@@ -184,10 +185,12 @@ export let Outro = ({ recorder }: { recorder?: MediaRecorder }) => {
         .map(() => Math.floor(Math.random() * 16).toString(16))
         .join("");
 
-      let formData = new FormData();
-      formData.append(`recording_${date}_${nonce}.${ext}`, e.data);
+      setUrlParams({
+        href: URL.createObjectURL(e.data),
+        download: `recording_${date}_${nonce}.${ext}`,
+      });
 
-      let xhr = new XMLHttpRequest();
+      /*let xhr = new XMLHttpRequest();
       xhr.upload.addEventListener("progress", (event) => {
         if (event.lengthComputable)
           console.log("upload progress:", event.loaded / event.total);
@@ -198,7 +201,7 @@ export let Outro = ({ recorder }: { recorder?: MediaRecorder }) => {
       xhr.open("POST", "https://mindover.computer/upload");
       xhr.setRequestHeader("X-Requested-With", "XMLHttpRequest");
       xhr.setRequestHeader("Access-Control-Allow-Origin", "*");
-      xhr.send(formData);
+      xhr.send(formData);*/
     });
     recorder.stop();
     recorder.stream.getTracks().forEach((track) => track.stop());
@@ -208,11 +211,33 @@ export let Outro = ({ recorder }: { recorder?: MediaRecorder }) => {
 
   return (
     <div className="container">
-      <p>Thank you for your participation in the experiment!</p>
       {recorder ? (
         <>
-          <p>We have stopped recording your screen and audio.</p>
-          {uploaded ? (
+          <p>
+            <strong>DO NOT CLOSE THE TAB YET.</strong> We have stopped recording
+            your screen and audio.
+          </p>
+          {urlParams ? (
+            <>
+              <p>
+                Next, please click here to download the recorded video:{" "}
+                <a {...urlParams}>Download</a>
+              </p>
+              <p>
+                Then upload the video to this Dropbox link:{" "}
+                <a
+                  href="https://www.dropbox.com/request/C5SmLxFBl0EkWzRvtZFW"
+                  target="_blank"
+                >
+                  https://www.dropbox.com/request/C5SmLxFBl0EkWzRvtZFW
+                </a>
+              </p>
+              <p>And that's it! Thanks for your participation.</p>
+            </>
+          ) : (
+            <p>Wait while we prepare the recorded video...</p>
+          )}
+          {/* {uploaded ? (
             <p>
               The recording has been successfully uploaded. You may now close
               this tab.
@@ -229,9 +254,11 @@ export let Outro = ({ recorder }: { recorder?: MediaRecorder }) => {
                 wait a minute for the upload to complete...
               </p>
             </>
-          )}
+          )} */}
         </>
-      ) : null}
+      ) : (
+        <p>Thank you for your participation in the experiment!</p>
+      )}
     </div>
   );
 };
