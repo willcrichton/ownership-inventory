@@ -304,7 +304,7 @@ fn get_or_default(arg: &Option<String>) -> String {
   `
 // Removes all the zeros in-place from a vector of integers.
 fn remove_zeros(v: &mut Vec<i32>) {
-  for (t, i) in v.iter().enumerate().rev() {
+  for (i, t) in v.iter().enumerate().rev() {
     if *t == 0 {
       v.remove(i);
     }
