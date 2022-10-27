@@ -333,7 +333,8 @@ export let Editor: React.FC<{
 
     let lineHeight = editor.getOption(monaco.editor.EditorOption.lineHeight);
     let lineCount = model.getLineCount();
-    let height = editor.getTopForLineNumber(lineCount + 1) + lineHeight;
+    let desiredCount = Math.max(lineCount, 8);
+    let height = editor.getTopForLineNumber(desiredCount + 1) + lineHeight;
     ref.current!.style.height = `${height}px`;
     editor.layout();
 
