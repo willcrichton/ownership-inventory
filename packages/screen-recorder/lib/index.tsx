@@ -1,6 +1,7 @@
 import _ from "lodash";
 import React, { useEffect, useRef, useState } from "react";
-import windowShareUrl from "./assets/window-share.png";
+//@ts-ignore
+import windowShareUrl from "./window-share.png";
 
 let VideoPreview = ({ stream }: { stream: MediaStream }) => {
   let ref = useRef<HTMLVideoElement>(null);

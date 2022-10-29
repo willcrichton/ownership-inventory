@@ -2,8 +2,8 @@ import _ from "lodash";
 import spinnerUrl from "./assets/spinner.gif";
 import React, { useEffect, useState } from "react";
 import ReactDOM from "react-dom/client";
-import { Editor, RustAnalyzer } from "./editor/mod";
-import { RecordingSetup, Outro } from "./recording";
+import { Editor, RustAnalyzer } from "@wcrichto/rust-editor";
+import { RecordingSetup, Outro } from "@wcrichto/screen-recorder";
 import "./index.scss";
 
 interface EvalResult {
@@ -60,7 +60,7 @@ let RunnableEditor = ({
     <div className="runnable-editor">
       <Editor
         contents={state.contents}
-        onChange={(c) => {
+        onChange={(c: any) => {
           state.contents = c;
           onChange(c);
         }}
@@ -189,7 +189,7 @@ let Problem = ({
           contents={`fn main(){\n\n}`}
           disabled={finished}
           ra={!finished ? ra : undefined}
-          onChange={(s) => {
+          onChange={(s: any) => {
             answer.safetyViolation = s;
           }}
         />

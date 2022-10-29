@@ -1,7 +1,7 @@
 import init, {
   WorldState,
   initThreadPool,
-} from "../../rust-analyzer-wasm/ra-wasm/pkg/wasm_demo.js";
+} from "./ra-wasm/wasm_demo.js";
 
 const start = async () => {
   await init();
