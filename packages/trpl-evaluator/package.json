@@ -1,0 +1,19 @@
+{
+  "name": "@wcrichto/trpl-evaluator",
+  "private": true,
+  "version": "0.0.1",
+  "devDependencies": {
+    "@iarna/toml": "^2.2.5",
+    "@types/react": "^18.0.17",
+    "@types/react-dom": "^18.0.6",
+    "@types/uuid": "^8.3.4",
+    "@wcrichto/screen-recorder": "^0.0.1",
+    "@wcrichto/quiz": "^0.1.4",
+    "highlight.js": "10.1.1",
+    "mobx": "^6.6.2",
+    "mobx-react": "^7.5.3",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "uuid": "^9.0.0"
+  }
+}

@@ -4,13 +4,19 @@ importers:
 
   .:
     specifiers:
-      esbuild: ^0.15.6
+      '@vitejs/plugin-react': ^2.0.1
+      esbuild: ^0.15.12
       fs-extra: ^10.1.0
+      sass: ^1.54.8
       typescript: ^4.6.4
+      vite: ^3.2.1
     devDependencies:
+      '@vitejs/plugin-react': 2.2.0_vite@3.2.1
       esbuild: 0.15.12
       fs-extra: 10.1.0
+      sass: 1.55.0
       typescript: 4.8.4
+      vite: 3.2.1_sass@1.55.0
 
   packages/ownership-inventory:
     specifiers:
@@ -78,6 +84,35 @@ importers:
     devDependencies:
       '@types/lodash': 4.14.186
       '@types/react': 18.0.24
+
+  packages/trpl-evaluator:
+    specifiers:
+      '@iarna/toml': ^2.2.5
+      '@types/react': ^18.0.17
+      '@types/react-dom': ^18.0.6
+      '@types/uuid': ^8.3.4
+      '@wcrichto/quiz': ^0.1.4
+      '@wcrichto/screen-recorder': ^0.0.1
+      highlight.js: 10.1.1
+      mobx: ^6.6.2
+      mobx-react: ^7.5.3
+      react: ^18.2.0
+      react-dom: ^18.2.0
+      uuid: ^9.0.0
+    dependencies:
+      '@wcrichto/quiz': 0.1.4_zobzqlqy6k4bhcqpt2jk7hy7ly
+    devDependencies:
+      '@iarna/toml': 2.2.5
+      '@types/react': 18.0.24
+      '@types/react-dom': 18.0.8
+      '@types/uuid': 8.3.4
+      '@wcrichto/screen-recorder': link:../screen-recorder
+      highlight.js: 10.1.1
+      mobx: 6.6.2
+      mobx-react: 7.5.3_qrr2ojv4n7h7ey2xj7njerqqr4
+      react: 18.2.0
+      react-dom: 18.2.0_react@18.2.0
+      uuid: 9.0.0
 
 packages:
 
@@ -366,6 +401,10 @@ packages:
     dev: true
     optional: true
 
+  /@iarna/toml/2.2.5:
+    resolution: {integrity: sha512-trnsAYxU3xnS1gPHPyU961coFyLkh4gAD/0zQ5mymY4yOZ+CYvsPqUbOFSw0aDM4y0tV7tiFxL/1XfXPNC6IPg==}
+    dev: true
+
   /@jridgewell/gen-mapping/0.1.1:
     resolution: {integrity: sha512-sQXCasFk+U8lWYEe66WxRDOE9PjVz4vSM51fTu3Hw+ClTpUSQb718772vH3pyS5pShp6lvQM7SxgIDXXXmOX7w==}
     engines: {node: '>=6.0.0'}
@@ -451,6 +490,10 @@ packages:
     resolution: {integrity: sha512-I49NtT8w6syBI3Zg3ixCyygTHoTVMY0z2TMRcTgccdIsVd2MwlKk7ITLHLsJtgchUHcOd7QEARG9h0ifcA6l2Q==}
     dev: true
 
+  /@types/uuid/8.3.4:
+    resolution: {integrity: sha512-c/I8ZRb51j+pYGAu5CrFMRxqZ2ke4y2grEBO5AUjgSkSk+qT2Ea+OdWElz/OiMf5MNpn2b17kuVBwZLQJXzihw==}
+    dev: true
+
   /@vitejs/plugin-react/2.2.0_vite@3.2.1:
     resolution: {integrity: sha512-FFpefhvExd1toVRlokZgxgy2JtnBOdp4ZDsq7ldCWaqGSGn9UhWMAVm/1lxPL14JfNS5yGz+s9yFrQY6shoStA==}
     engines: {node: ^14.18.0 || >=16.0.0}
@@ -468,6 +511,20 @@ packages:
     transitivePeerDependencies:
       - supports-color
     dev: true
+
+  /@wcrichto/quiz/0.1.4_zobzqlqy6k4bhcqpt2jk7hy7ly:
+    resolution: {integrity: sha512-wcMZc/BIbC2Vy4qZa2BXtWtriyWXCY3seubWw0S3vA251yyPbdk88FpY4MCqUOAo0znPapRSrLCPl0PLzHcMfw==}
+    peerDependencies:
+      mobx: ^6.6.0
+      mobx-react: ^7.5.0
+      react: ^18.1.0
+      react-dom: ^18.1.0
+    dependencies:
+      mobx: 6.6.2
+      mobx-react: 7.5.3_qrr2ojv4n7h7ey2xj7njerqqr4
+      react: 18.2.0
+      react-dom: 18.2.0_react@18.2.0
+    dev: false
 
   /ansi-styles/3.2.1:
     resolution: {integrity: sha512-VT0ZI6kZRdTh8YyJw3SMbYm/u+NqfsAxEpWO0Pf9sq8/e94WxxOpPKx9FR1FlyCtOVDNOQ+8ntlqFxiRc+r5qA==}
@@ -1034,6 +1091,11 @@ packages:
       function-bind: 1.1.1
     dev: true
 
+  /highlight.js/10.1.1:
+    resolution: {integrity: sha512-b4L09127uVa+9vkMgPpdUQP78ickGbHEQTWeBrQFTJZ4/n2aihWOGS0ZoUqAwjVmfjhq/C76HRzkqwZhK4sBbg==}
+    deprecated: Potential vulnerability. Upgrade to @latest
+    dev: true
+
   /immutable/4.1.0:
     resolution: {integrity: sha512-oNkuqVTA8jqG1Q6c+UglTOD1xhC1BtjKI7XkCXRkZHrN5m18/XsnUp8Q89GkQO/z+0WjonSvl0FLhDYftp46nQ==}
     dev: true
@@ -1234,7 +1296,6 @@ packages:
       mobx: 6.6.2
       react: 18.2.0
       react-dom: 18.2.0_react@18.2.0
-    dev: true
 
   /mobx-react/7.5.3_qrr2ojv4n7h7ey2xj7njerqqr4:
     resolution: {integrity: sha512-+ltotliKt4Bjn3d8taZH/VFAcRUbaASvsM8/QSvmHXcZ++RZwaFtjl9JkIosy1byaJGEDS3EFFx2InRm2VaSUw==}
@@ -1253,11 +1314,9 @@ packages:
       mobx-react-lite: 3.4.0_qrr2ojv4n7h7ey2xj7njerqqr4
       react: 18.2.0
       react-dom: 18.2.0_react@18.2.0
-    dev: true
 
   /mobx/6.6.2:
     resolution: {integrity: sha512-IOpS0bf3+hXIhDIy+CmlNMBfFpAbHS0aVHcNC+xH/TFYEKIIVDKNYRh9eKlXuVfJ1iRKAp0cRVmO145CyJAMVQ==}
-    dev: true
 
   /monaco-editor/0.34.1:
     resolution: {integrity: sha512-FKc80TyiMaruhJKKPz5SpJPIjL+dflGvz4CpuThaPMc94AyN7SeC9HQ8hrvaxX7EyHdJcUY5i4D0gNyJj1vSZQ==}
@@ -1514,6 +1573,11 @@ packages:
       browserslist: 4.21.4
       escalade: 3.1.1
       picocolors: 1.0.0
+    dev: true
+
+  /uuid/9.0.0:
+    resolution: {integrity: sha512-MXcSTerfPa4uqyzStbRoTgt5XIe3x5+42+q1sDuy3R5MDk66URdLMOZe5aPX/SQd+kuYAh0FdP/pO28IkQyTeg==}
+    hasBin: true
     dev: true
 
   /vite/3.2.1_sass@1.55.0:

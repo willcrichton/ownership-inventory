@@ -2,10 +2,7 @@
   "name": "@wcrichto/rust-editor",
   "version": "0.0.1",
   "type": "module",
-  "main": "dist/index.js",
-  "scripts": {
-    "build": "tsc && node build.mjs"
-  },
+  "main": "dist/lib.js",
   "dependencies": {
     "monaco-editor": "^0.34.0"
   },

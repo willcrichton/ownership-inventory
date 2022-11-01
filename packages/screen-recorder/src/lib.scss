@@ -1,0 +1,14 @@
+.video-visualizer {
+  border: 2px solid #ccc;
+}
+
+.audio-visualizer {
+  height: 16px;
+  border: 1px solid #ccc;
+  width: 500px;
+
+  .bar {
+    background-color: green;
+    height: 100%;
+  }
+}

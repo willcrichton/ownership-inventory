@@ -1,7 +1,1 @@
-{
-  "extends": "../../tsconfig.json",
-  "include": ["lib"],
-  "compilerOptions": {
-    "outDir": "dist",
-  }
-}
+/Users/will/Code/graco/dist/assets/tsconfig.default.json

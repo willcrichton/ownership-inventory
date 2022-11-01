@@ -2,10 +2,7 @@
   "name": "@wcrichto/screen-recorder",
   "version": "0.0.1",
   "type": "module",
-  "main": "dist/index.js",
-  "scripts": {
-    "build": "tsc && node build.mjs"
-  },
+  "main": "dist/lib.js",
   "peerDependencies": {
     "react": "^18.2.0",
     "react-dom": "^18.2.0"

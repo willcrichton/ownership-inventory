@@ -1,14 +1,23 @@
 import _ from "lodash";
 import React, { useEffect, useRef, useState } from "react";
 //@ts-ignore
-import windowShareUrl from "./window-share.png";
+import windowShareUrl from "./window-share.png?url";
+import "./lib.scss";
 
 let VideoPreview = ({ stream }: { stream: MediaStream }) => {
   let ref = useRef<HTMLVideoElement>(null);
   useEffect(() => {
     ref.current!.srcObject = stream;
   }, []);
-  return <video width={300} height={300} autoPlay ref={ref} />;
+  return (
+    <video
+      className="video-visualizer"
+      width={300}
+      height={300}
+      autoPlay
+      ref={ref}
+    />
+  );
 };
 
 let AudioPreview = ({ stream }: { stream: MediaStream }) => {
@@ -50,6 +59,7 @@ let AudioPreview = ({ stream }: { stream: MediaStream }) => {
   );
 };
 
+/** Test */
 export let RecordingSetup = ({
   next,
   registerRecorder,
