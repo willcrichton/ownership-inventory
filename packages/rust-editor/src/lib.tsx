@@ -42,6 +42,7 @@ import "monaco-editor/esm/vs/editor/contrib/viewportSemanticTokens/browser/viewp
 import "monaco-editor/esm/vs/editor/contrib/wordHighlighter/browser/wordHighlighter";
 import "monaco-editor/esm/vs/editor/contrib/wordOperations/browser/wordOperations";
 import "monaco-editor/esm/vs/editor/contrib/wordPartOperations/browser/wordPartOperations";
+import * as monaco from "monaco-editor/esm/vs/editor/editor.api";
 import "monaco-editor/esm/vs/editor/standalone/browser/accessibilityHelp/accessibilityHelp";
 import "monaco-editor/esm/vs/editor/standalone/browser/iPadShowKeyboard/iPadShowKeyboard";
 import "monaco-editor/esm/vs/editor/standalone/browser/inspectTokens/inspectTokens";
@@ -51,13 +52,11 @@ import "monaco-editor/esm/vs/editor/standalone/browser/quickAccess/standaloneGot
 import "monaco-editor/esm/vs/editor/standalone/browser/quickAccess/standaloneHelpQuickAccess";
 import "monaco-editor/esm/vs/editor/standalone/browser/referenceSearch/standaloneReferenceSearch";
 import "monaco-editor/esm/vs/editor/standalone/browser/toggleHighContrast/toggleHighContrast";
-import * as monaco from "monaco-editor/esm/vs/editor/editor.api";
 import React, { useEffect, useRef, useState } from "react";
 
 import fake_alloc from "./fake_alloc.rs?raw";
 import fake_core from "./fake_core.rs?raw";
 import fake_std from "./fake_std.rs?raw";
-
 import { conf, grammar } from "./rust-grammar";
 
 const MODE_ID = "rust";
@@ -133,7 +132,7 @@ export class RustAnalyzer {
       },
     };
 
-    worker.onmessage = (e) => {
+    worker.onmessage = e => {
       if (e.data.id == "ra-worker-ready") {
         ready(new Proxy({}, proxyHandler));
         return;
@@ -164,7 +163,7 @@ export class RustAnalyzer {
             lineNumber: range.startLineNumber,
           };
 
-          const references = command.positions.map((pos) => ({
+          const references = command.positions.map(pos => ({
             range: pos,
             uri: m.uri,
           }));
@@ -196,7 +195,7 @@ export class RustAnalyzer {
     monaco.languages.registerInlayHintsProvider(MODE_ID, {
       async provideInlayHints(model, range, token) {
         let hints = await state.inlay_hints();
-        return hints.map((hint) => {
+        return hints.map(hint => {
           if (hint.hint_type == 1) {
             return {
               kind: 1,
@@ -231,7 +230,7 @@ export class RustAnalyzer {
         const edits = await state.rename(pos.lineNumber, pos.column, newName);
         if (edits) {
           return {
-            edits: edits.map((edit) => ({
+            edits: edits.map(edit => ({
               resource: m.uri,
               edit,
             })),
@@ -266,7 +265,7 @@ export class RustAnalyzer {
       async provideDefinition(m, pos) {
         const list = await state.definition(pos.lineNumber, pos.column);
         if (list) {
-          return list.map((def) => ({ ...def, uri: m.uri }));
+          return list.map(def => ({ ...def, uri: m.uri }));
         }
       },
     });
@@ -274,7 +273,7 @@ export class RustAnalyzer {
       async provideTypeDefinition(m, pos) {
         const list = await state.type_definition(pos.lineNumber, pos.column);
         if (list) {
-          return list.map((def) => ({ ...def, uri: m.uri }));
+          return list.map(def => ({ ...def, uri: m.uri }));
         }
       },
     });
@@ -285,7 +284,7 @@ export class RustAnalyzer {
           pos.column
         );
         if (list) {
-          return list.map((def) => ({ ...def, uri: m.uri }));
+          return list.map(def => ({ ...def, uri: m.uri }));
         }
       },
     });
@@ -327,7 +326,7 @@ export let Editor: React.FC<{
       scrollBeyondLastLine: false,
       folding: false,
       lineNumbersMinChars: 2,
-      fontSize: "14px"
+      fontSize: "14px",
     });
     setEditor(editor);
 

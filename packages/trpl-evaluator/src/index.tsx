@@ -1,8 +1,8 @@
+import toml from "@iarna/toml";
+import { Quiz, QuizView, TaggedAnswer } from "@wcrichto/quiz";
+import { RecordingSetup } from "@wcrichto/screen-recorder";
 import React, { useMemo, useState } from "react";
 import ReactDOM from "react-dom/client";
-import { QuizView, Quiz, TaggedAnswer } from "@wcrichto/quiz";
-import { RecordingSetup } from "@wcrichto/screen-recorder";
-import toml from "@iarna/toml";
 import { v4 as uuidv4 } from "uuid";
 
 //@ts-ignore

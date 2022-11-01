@@ -24,3 +24,7 @@ dist-ssr
 *.sw?
 
 rust-analyzer-wasm
+# Managed by Greco
+.eslintrc.js
+.prettierrc.js
+jest.config.js

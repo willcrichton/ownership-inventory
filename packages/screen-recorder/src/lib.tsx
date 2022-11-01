@@ -1,8 +1,9 @@
 import _ from "lodash";
 import React, { useEffect, useRef, useState } from "react";
+
+import "./lib.scss";
 //@ts-ignore
 import windowShareUrl from "./window-share.png?url";
-import "./lib.scss";
 
 let VideoPreview = ({ stream }: { stream: MediaStream }) => {
   let ref = useRef<HTMLVideoElement>(null);
@@ -31,7 +32,7 @@ let AudioPreview = ({ stream }: { stream: MediaStream }) => {
       src.connect(node);
 
       let volumes: number[] = [];
-      node.port.onmessage = (event) => {
+      node.port.onmessage = event => {
         volumes.push(event.data.volume);
         if (volumes.length > 10) volumes.shift();
       };
@@ -177,7 +178,7 @@ export let Outro = ({ recorder }: { recorder?: MediaRecorder }) => {
   let [urlParams, setUrlParams] = useState<any | undefined>();
   useEffect(() => {
     if (!recorder) return;
-    recorder.addEventListener("dataavailable", (e) => {
+    recorder.addEventListener("dataavailable", e => {
       if (e.data.size == 0) return;
 
       let mime = e.data.type.split(";")[0];
@@ -189,7 +190,7 @@ export let Outro = ({ recorder }: { recorder?: MediaRecorder }) => {
 
       let now = new Date();
       let date = [now.getFullYear(), now.getMonth(), now.getDate()]
-        .map((n) => n.toString().padStart(2, "0"))
+        .map(n => n.toString().padStart(2, "0"))
         .join("-");
 
       let nonce = _.range(6)
@@ -215,7 +216,7 @@ export let Outro = ({ recorder }: { recorder?: MediaRecorder }) => {
       xhr.send(formData);*/
     });
     recorder.stop();
-    recorder.stream.getTracks().forEach((track) => track.stop());
+    recorder.stream.getTracks().forEach(track => track.stop());
   }, []);
 
   // TODO: if upload fails, give option to download and ask them to send it.
