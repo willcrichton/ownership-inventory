@@ -25,6 +25,7 @@ dist-ssr
 
 rust-analyzer-wasm
 # Managed by Greco
+pnpm-workspace.yaml
 .eslintrc.js
 .prettierrc.js
 jest.config.js

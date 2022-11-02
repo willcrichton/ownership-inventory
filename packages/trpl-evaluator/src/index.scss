@@ -1,5 +1,6 @@
 @use "@wcrichto/quiz/dist/embed.css";
 @use "highlight.js/styles/github.css";
+@use "@wcrichto/screen-recorder/dist/lib.css";
 
 :root {
   --bg: hsl(0, 0%, 100%);
@@ -34,7 +35,22 @@
   font-family: "Helvetica Neue", Arial, sans-serif;
 }
 
+pre, code {
+  font-family: "Inconsolata", monospace;
+}
+
 .app {
   width: 800px;
   margin: 1em auto;
+}
+
+.mdbook-quiz .answer .answer-row > div {
+  .correct:before, .incorrect:before {
+    font-size: 1em;
+  }
+}
+
+.next {
+  font-size: 24px;
+  cursor: pointer;  
 }

@@ -1,7 +1,1 @@
-{
-  "extends": "../../tsconfig.json",
-  "include": ["src", "../screen-recorder/lib/recording.tsx"],
-  "compilerOptions": {
-    "outDir": "dist",
-  }
-}
+/Users/will/Code/graco/dist/assets/tsconfig.json

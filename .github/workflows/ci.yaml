@@ -16,10 +16,13 @@ jobs:
           cd packages/rust-editor
           ./setup-wasm.sh
       - run: | 
-          npm install -g pnpm   
-          pnpm install
-          pnpm build
+          npm install -g pnpm git+https://github.com/willcrichton/graco/
+          graco init
+          graco build
+          mkdir dist
+          mv packages/ownership-inventory/dist dist/ownership-inventory
+          mv packages/trpl-evaluator/dist dist/trpl-evaluator
       - uses: peaceiris/actions-gh-pages@v3
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./packages/ownership-inventory/dist
+          publish_dir: ./dist

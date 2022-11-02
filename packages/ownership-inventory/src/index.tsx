@@ -1,5 +1,4 @@
 import { Editor, RustAnalyzer } from "@wcrichto/rust-editor";
-import { Outro, RecordingSetup } from "@wcrichto/screen-recorder";
 import _ from "lodash";
 import React, { useEffect, useState } from "react";
 import ReactDOM from "react-dom/client";
@@ -242,13 +241,7 @@ let Problem = ({
   );
 };
 
-let Intro = ({
-  recorder,
-  next,
-}: {
-  recorder?: MediaRecorder;
-  next: () => void;
-}) => {
+let Intro = ({ next }: { next: () => void }) => {
   return (
     <div className="container">
       <p>
@@ -258,14 +251,6 @@ let Intro = ({
         be presented with a series of questions about ownership in Rust. Please
         answer to the best of your ability.
       </p>
-      {recorder ? (
-        <p>
-          To help us understand your problem-solving process, this webpage will
-          record your screen and microphone. You will talk aloud as you solve
-          each problem. At the end, you will upload the recording to our secure
-          server.
-        </p>
-      ) : null}
       <p>
         <button style={{ marginRight: "20px" }} onClick={next}>
           I understand and want to participate
@@ -314,14 +299,9 @@ fn remove_zeros(v: &mut Vec<i32>) {
   `,
 ];
 
-let urlParams = new URLSearchParams(window.location.search);
-
 let App = () => {
-  let [stage, setStage] = useState<"start" | "setup" | "problems" | "end">(
-    "start"
-  );
+  let [stage, setStage] = useState<"start" | "problems" | "end">("start");
   let [problem, setProblem] = useState(0);
-  let [recorder, setRecorder] = useState<MediaRecorder | undefined>();
   let [answers] = useState<any[]>([]);
 
   useEffect(() => {
@@ -360,17 +340,7 @@ let App = () => {
         </h1>
       </div>
       {stage === "start" ? (
-        <Intro
-          recorder={recorder}
-          next={() =>
-            setStage(urlParams.get("record") !== null ? "setup" : "problems")
-          }
-        />
-      ) : stage === "setup" ? (
-        <RecordingSetup
-          next={() => setStage("problems")}
-          registerRecorder={setRecorder}
-        />
+        <Intro next={() => setStage("problems")} />
       ) : stage == "problems" ? (
         <Problem
           key={problem}
@@ -386,7 +356,10 @@ let App = () => {
           }}
         />
       ) : (
-        <Outro recorder={recorder} />
+        <p>
+          Thank you for your participation in the experiment! You may close this
+          tab now.
+        </p>
       )}
     </>
   );

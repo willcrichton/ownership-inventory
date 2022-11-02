@@ -60,13 +60,50 @@ let AudioPreview = ({ stream }: { stream: MediaStream }) => {
   );
 };
 
+const MIME_TYPES: [string, string][] = [
+  ["video/mp4", "mp4"],
+  ["video/webm", "webm"],
+  ["video/x-matroska", "mkv"],
+];
+
+export class Recorder {
+  private chunks: Blob[] = [];
+  private mediaRecorder: MediaRecorder;
+  readonly extension: string;
+
+  constructor(videoStream: MediaStream) {
+    let pair = MIME_TYPES.find(([type]) => MediaRecorder.isTypeSupported(type));
+
+    if (!pair) throw new Error("No supported video type!");
+    let [mimeType, ext] = pair;
+    this.extension = ext;
+    console.debug(`Mime type: ${mimeType}`);
+
+    this.mediaRecorder = new MediaRecorder(videoStream, { mimeType });
+    this.mediaRecorder.addEventListener("dataavailable", e => {
+      this.chunks.push(e.data);
+    });
+    this.mediaRecorder.start();
+  }
+
+  stop(): Promise<Blob> {
+    return new Promise(resolve => {
+      this.mediaRecorder.addEventListener("stop", () => {
+        resolve(new Blob(this.chunks, { type: this.chunks[0].type }));
+      });
+      this.mediaRecorder.stop();
+      this.mediaRecorder.stream.getTracks().forEach(track => track.stop());
+    });
+  }
+}
+
 /** Test */
 export let RecordingSetup = ({
   next,
   registerRecorder,
 }: {
   next: () => void;
-  registerRecorder: (recorder: MediaRecorder) => void;
+  registerRecorder: (recorder: Recorder) => void;
 }) => {
   let [videoStream, setVideoStream] = useState<MediaStream | null>(null);
   let [audioStream, setAudioStream] = useState<MediaStream | null>(null);
@@ -111,9 +148,7 @@ export let RecordingSetup = ({
       // TODO: handle the case where user cancels recording
     });
 
-    let recorder = new MediaRecorder(videoStream!);
-    recorder.start();
-    registerRecorder(recorder);
+    registerRecorder(new Recorder(videoStream!));
     next();
   };
 
@@ -173,33 +208,28 @@ export let RecordingSetup = ({
   );
 };
 
-export let Outro = ({ recorder }: { recorder?: MediaRecorder }) => {
+export let Outro = ({
+  recorder,
+  dropboxUrl,
+  uuid,
+}: {
+  recorder?: Recorder;
+  dropboxUrl: string;
+  uuid: string;
+}) => {
   // let [uploaded, setUploaded] = useState(false);
   let [urlParams, setUrlParams] = useState<any | undefined>();
   useEffect(() => {
     if (!recorder) return;
-    recorder.addEventListener("dataavailable", e => {
-      if (e.data.size == 0) return;
-
-      let mime = e.data.type.split(";")[0];
-      let exts: { [k: string]: string } = {
-        "video/x-matroska": "mkv",
-        "video/mp4": "mp4",
-      };
-      let ext = exts[mime] || "unk";
-
+    recorder.stop().then(data => {
       let now = new Date();
       let date = [now.getFullYear(), now.getMonth(), now.getDate()]
         .map(n => n.toString().padStart(2, "0"))
         .join("-");
 
-      let nonce = _.range(6)
-        .map(() => Math.floor(Math.random() * 16).toString(16))
-        .join("");
-
       setUrlParams({
-        href: URL.createObjectURL(e.data),
-        download: `recording_${date}_${nonce}.${ext}`,
+        href: URL.createObjectURL(data),
+        download: `recording_${date}_${uuid}.${recorder.extension}`,
       });
 
       /*let xhr = new XMLHttpRequest();
@@ -215,8 +245,6 @@ export let Outro = ({ recorder }: { recorder?: MediaRecorder }) => {
       xhr.setRequestHeader("Access-Control-Allow-Origin", "*");
       xhr.send(formData);*/
     });
-    recorder.stop();
-    recorder.stream.getTracks().forEach(track => track.stop());
   }, []);
 
   // TODO: if upload fails, give option to download and ask them to send it.
@@ -237,14 +265,11 @@ export let Outro = ({ recorder }: { recorder?: MediaRecorder }) => {
               </p>
               <p>
                 Then upload the video to this Dropbox link:{" "}
-                <a
-                  href="https://www.dropbox.com/request/C5SmLxFBl0EkWzRvtZFW"
-                  target="_blank"
-                >
-                  https://www.dropbox.com/request/C5SmLxFBl0EkWzRvtZFW
+                <a href={dropboxUrl} target="_blank" rel="noreferrer">
+                  {dropboxUrl}
                 </a>
               </p>
-              <p>And that's it! Thanks for your participation.</p>
+              <p>And that&apos;s it! Thanks for your participation.</p>
             </>
           ) : (
             <p>Wait while we prepare the recorded video...</p>
