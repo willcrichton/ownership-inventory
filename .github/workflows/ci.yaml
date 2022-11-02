@@ -17,7 +17,9 @@ jobs:
           ./setup-wasm.sh
       - uses: pnpm/action-setup@v2
       - run: | 
-          pnpm install -g git+https://github.com/willcrichton/graco/
+          git clone https://github.com/willcrichton/graco/
+          cd graco && pnpm install && pnpm build && pnpm link --global
+          cd ..
           graco init
           graco build
           mkdir dist
