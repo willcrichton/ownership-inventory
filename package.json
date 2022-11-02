@@ -3,6 +3,7 @@
   "scripts": {
     "build": "pnpm run -r build"
   },
+  "packageManager": "pnpm@7.6.0",
   "devDependencies": {
     "@vitejs/plugin-react": "^2.0.1",
     "esbuild": "^0.15.12",
