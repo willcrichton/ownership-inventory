@@ -15,8 +15,9 @@ jobs:
       - run: |
           cd packages/rust-editor
           ./setup-wasm.sh
+      - uses: pnpm/action-setup@v2
       - run: | 
-          npm install -g pnpm git+https://github.com/willcrichton/graco/
+          pnpm install -g git+https://github.com/willcrichton/graco/
           graco init
           graco build
           mkdir dist
