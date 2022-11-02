@@ -15,7 +15,7 @@ export let App = () => {
   let questions = toml.parse(questionsToml) as any as Quiz;
 
   let [recorder, setRecorder] = useState<Recorder | undefined>();
-  let [stage, setStage] = useState<"start" | "setup" | "quiz" | "end">("setup");
+  let [stage, setStage] = useState<"start" | "setup" | "quiz" | "end">("start");
   let [quizFinished, setQuizFinished] = useState(false);
 
   let onFinish = (answers: TaggedAnswer[]) => {
