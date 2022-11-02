@@ -21,7 +21,7 @@ jobs:
           cd graco && pnpm install && pnpm build && pnpm link --global
           cd ..
           graco init
-          graco build
+          pnpm -r exec graco build
           mkdir dist
           mv packages/ownership-inventory/dist dist/ownership-inventory
           mv packages/trpl-evaluator/dist dist/trpl-evaluator
