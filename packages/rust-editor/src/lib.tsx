@@ -193,7 +193,7 @@ export class RustAnalyzer {
       },
     });
     monaco.languages.registerInlayHintsProvider(MODE_ID, {
-      async provideInlayHints(model, range, token) {
+      async provideInlayHints(_model, _range, _token) {
         let hints = await state.inlay_hints();
         return hints.map(hint => {
           if (hint.hint_type == 1) {

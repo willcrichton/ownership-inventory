@@ -205,7 +205,11 @@ let Problem = ({
           You can change any aspect of the function, including the type
           signature. You can click "Run" to get feedback from the compiler. You
           may use the{" "}
-          <a href="https://doc.rust-lang.org/std/" target="_blank">
+          <a
+            href="https://doc.rust-lang.org/std/"
+            target="_blank"
+            rel="noreferrer"
+          >
             standard library documentation
           </a>
           .
