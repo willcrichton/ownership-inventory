@@ -459,6 +459,10 @@ github.com style (c) Vasily Polovnyov <vast@whiteants.net>
   background-color: green;
   height: 100%;
 }
+
+.recording-setup button {
+  font-size: 110%;
+}
 :root {
   --bg: hsl(0, 0%, 100%);
   --fg: hsl(0, 0%, 0%);
@@ -507,4 +511,11 @@ pre, code {
 .next {
   font-size: 24px;
   cursor: pointer;
+}
+
+.intro li {
+  margin-block-end: 1em;
+}
+.intro button {
+  font-size: 100%;
 }

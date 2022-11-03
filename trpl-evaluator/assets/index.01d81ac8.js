@@ -40869,7 +40869,7 @@ var lodash = { exports: {} };
   }).call(commonjsGlobal);
 })(lodash, lodash.exports);
 const _ = lodash.exports;
-var window_share_default = new URL("" + new URL("window-share.189c2b0a.png", import.meta.url).href, self.location);
+var window_share_default = new URL("" + new URL("window-share.20a037d2.png", import.meta.url).href, self.location);
 var VideoPreview = ({
   stream: stream2
 }) => {
@@ -40929,8 +40929,11 @@ var AudioPreview = ({
 };
 var MIME_TYPES = [["video/mp4", "mp4"], ["video/webm", "webm"], ["video/x-matroska", "mkv"]];
 var Recorder = class {
-  constructor(videoStream) {
+  constructor(videoStream, audioStream) {
     this.chunks = [];
+    let audioTrack = audioStream.getTracks()[0];
+    videoStream.addTrack(audioTrack);
+    audioStream.removeTrack(audioTrack);
     let pair = MIME_TYPES.find(([type]) => MediaRecorder.isTypeSupported(type));
     if (!pair)
       throw new Error("No supported video type!");
@@ -40942,6 +40945,10 @@ var Recorder = class {
     });
     this.mediaRecorder.addEventListener("dataavailable", (e) => {
       this.chunks.push(e.data);
+    });
+    let videoTrack = videoStream.getVideoTracks()[0];
+    videoTrack.addEventListener("ended", async () => {
+      document.getElementById("root").innerHTML = "<strong>Error:</strong> you cannot stop the screen recording during the experiment (it is an unrecoverable error right now). Please refresh the page and restart the experiment.";
     });
     this.mediaRecorder.start();
   }
@@ -40989,12 +40996,7 @@ var RecordingSetup = ({
   let finish = () => {
     if (!videoStream || !audioStream)
       throw new Error("Unreachable");
-    let audioTrack = audioStream.getTracks()[0];
-    videoStream.addTrack(audioTrack);
-    audioStream.removeTrack(audioTrack);
-    videoStream.getVideoTracks()[0].addEventListener("ended", () => {
-    });
-    registerRecorder(new Recorder(videoStream));
+    registerRecorder(new Recorder(videoStream, audioStream));
     next();
   };
   react.exports.useEffect(() => {
@@ -41005,11 +41007,11 @@ var RecordingSetup = ({
     });
   }, [videoStream, audioStream]);
   return /* @__PURE__ */ jsxs("div", {
-    className: "container",
+    className: "container recording-setup",
     children: [/* @__PURE__ */ jsxs("p", {
-      children: ["First, we need to setup the recording. Click the button below to enable screen recording, and ", /* @__PURE__ */ jsx("strong", {
-        children: "select the browser window"
-      }), " (not the tab!) to record as shown in the screenshot below."]
+      children: ["First, we need to setup the recording. Click the button below to enable screen recording, and", " ", /* @__PURE__ */ jsx("strong", {
+        children: "select the screen containing this browser"
+      }), " (not the tab!) to record. The screenshot below shows how this should look in Google Chrome."]
     }), /* @__PURE__ */ jsx("div", {
       children: /* @__PURE__ */ jsx("img", {
         style: {
@@ -41144,14 +41146,62 @@ function v4(options, buf, offset) {
   }
   return unsafeStringify(rnds);
 }
-const questionsToml = '[[questions]]\ntype = "Tracing"\nprompt.program = """\nfn main() {\n  let mut v = vec![1, 2, 3];\n  let mut v2 = Vec::new();\n  for i in &mut v {\n    v2.push(i);\n  }\n  *v2[0] = 5;\n\n  let a = *v2[0];\n  let b = v[0];\n  println!("{a} {b}");\n}\n"""\nanswer.doesCompile = true\nanswer.stdout = "5 5"\ncontext = """\n`i` has type `&mut i32`, meaning it is a pointer to a number within `v`. So if we push `i` into `v2`, then `v2` contains pointers to `v`. Therefore\nmutating `v2[0]` actually mutates `v[0]`.\n"""\n\n[[questions]]\ntype = "Tracing"\nprompt.program = """\n#[derive(Debug)]\nenum Either {\n  Left(usize),\n  Right(String)\n}\n\nfn main() {\n  let x = Either::Right(String::from("Hello world"));\n  let value = match x {\n    Either::Left(n) \u21D2 n,\n    Either::Right(s) \u21D2 s.len()\n  };\n  println!("{x:?} {value}");\n}\n"""\nanswer.doesCompile = false\nanswer.lineNumber = 13\ncontext = """\nA match moves its input, so `x` cannot be used in the `println`.\n"""\n\n# [[questions]]\n# type = "MultipleChoice"\n# prompt.prompt = """\n# Consider the variables `s2` and `s3` in the following program. These two variables will be located in memory within the stack frame for `main`. Each variable has a size in memory on the stack, *not* including the size of pointed data. Which statement is true about the sizes of `s2` and `s3`?\n\n# ```\n# fn main() {\n#   let s = String::from("hello");\n#   let s2: &String = &s;\n#   let s3: &str = &s;\n# }\n# ```\n# """\n# prompt.choices = [\n#   "`s3` has more bytes than `s2`",\n#   "`s3` has the same number of bytes as `s2`",\n#   "`s3` has fewer bytes than `s2`"\n# ]\n# answer.answer = 0\n# context = """\n# The type `&String` is a normal reference consisting of a single pointer, so 8 bytes on a 64-bit architecture. The type `&str` is a special slice reference which consists of a pointer *and* a length, so 16 bytes. Therefore `s3` of type `&str` uses more memory than `s2` of type `&String`. You can verify this yourself using [`std::mem::size_of`](https://doc.rust-lang.org/std/mem/fn.size_of.html), like so:\n\n# ```rust\n# fn main() {\n#   println!(\n#     "&String={} &str={}",\n#     std::mem::size_of::<&String>(),\n#     std::mem::size_of::<&str>(),\n#   );\n# }\n# ```\n\n# Also, note that Rust will implicitly convert string references to either `&String` or `&str` based on the context of the reference. So the expression `&s` produces two different values based on the expected type of `&s`.\n# """\n\n\n# [[questions]]\n# type = "ShortAnswer"\n# prompt.prompt = """\n# What is the maximum number of times a heap allocation could occur in this program? Write your answer in digits, e.g. 0 or 1.\n\n# ```\n# let s1 = String::from("tic");\n# let s2 = String::from("tac");\n# let s3 = String::from("toe");\n\n# let s = s1 + "-" + &s2 + "-" + &s3;\n# ```\n# """\n# answer.answer = "7"\n# context = """\n# One allocation for each call to `String::from`, and one allocation for every time `+` is called.\n# """\n\n# [[questions]]\n# type = "Tracing"\n# prompt.program = """\n# use std::collections::HashMap;\n# fn main() {\n#   let mut h = HashMap::new();\n#   for (i, c) in "hello!".chars().enumerate() {\n#     h.entry(c).or_insert(Vec::new()).push(i);\n#   }\n#   let mut sum = 0;\n#   for i in &h[&\'l\'] {\n#     sum += i;\n#   }\n#   println!("{}", sum);\n# }\n# """\n# answer.doesCompile = true\n# answer.stdout = "5"\n# context = """\n# This program stores a vector of indexes for each occurrence of a given letter into a hashmap. \n# Then it sums all the indexes for the letter \'l\', which occurs at indexes 2 and 3 in the string `"hello!"`.\n# """\n\n# [[questions]]\n# type = "ShortAnswer"\n# prompt.prompt = """\n# Imagine a Rust package with the following directory structure:\n\n# ```text\n# foobar\n# \u251C\u2500\u2500 Cargo.toml\n# \u2514\u2500\u2500 src/\n#     \u251C\u2500\u2500 lib.rs\n#     \u2514\u2500\u2500 engine/\n#         \u251C\u2500\u2500 mod.rs\n#         \u2514\u2500\u2500 analysis.rs\n# ```\n\n# The contents of each file are:\n\n\n# ```\n# // engine/analysis.rs\n# pub fn run() {}\n# ```\n\n# ```\n# // engine/mod.rs\n# mod analysis;\n# pub use analysis::*;\n# ```\n\n# ```\n# // lib.rs\n# pub mod engine;\n# ```\n\n# Say that another Rust developer is using the `foobar` library crate in a separate package, and they want to call the `run` function.\n# What is the path they would write?\n# """\n# answer.answer = "foobar::engine::run"\n# answer.alternatives = ["foobar::engine::run()"]\n# context = """\n# The module tree generated by this directory structure is as follows:\n\n# ```text\n# foobar\n# \u2514\u2500\u2500 engine\n#     \u2514\u2500\u2500 run  \n# ```\n\n# Therefore the path to `run` is `foobar::engine::run`.\n# """\n\n\n# [[questions]]\n# type = "Tracing"\n# prompt.program = """\n# fn print_slice<T>(v: &[T]) {\n#   for x in v {\n#     println!("{x}");\n#   }\n# }\n\n# fn main() {\n#   print_slice(&[1, 2, 3]);\n# }\n# """\n# answer.doesCompile = false\n# answer.lineNumber = 3\n# context = """\n# If a type is generic (like `T`), we cannot assume anything about it, including the ability to turn it into a string. Therefore `println!("{x}")` is invalid\n# because `x: &T`.\n# """\n\n# [[questions]]\n# type = "MultipleChoice"\n# prompt.prompt = """\n# Consider the following un-annotated function signature.\n\n# ```\n# struct Foo<\'a> {\n#   bar: &\'a i32\n# }\n\n# fn baz(f: &Foo) -> &i32 { /* ... */ }\n# ```\n\n# Will Rust accept this function signature? If so, what lifetimes will it infer?\n# """\n# prompt.choices = [\n#   "Rust will reject this function signature",\n#   """\n# ```\n# fn baz(f: &Foo) -> &i32\n# ```\n#   """,\n#   """\n# ```\n# fn baz<\'a>(f: &Foo<\'a>) -> &\'a i32\n# ```\n#   """,\n#   """\n# ```\n# fn baz<\'a>(f: &\'a Foo) -> &\'a i32\n# ```\n#   """,\n#   """\n# ```\n# fn baz<\'a, \'b>(f: &\'a Foo<\'b>) -> &\'a i32\n# ```\n#   """,\n#   """\n# ```\n# fn baz<\'a, \'b>(f: &\'a Foo<\'b>) -> &\'b i32\n# ```\n#   """\n# ]\n# answer.answer = 0\n# context = """\n# Rust will not compile this program, because it is ambiguous whether the lifetime of the output is tied to\n# the lifetime of `&Foo` or the reference `Foo.bar`.\n# """\n\n\n# [[questions]]\n# type = "Tracing"\n# prompt.program = """\n# struct Point<T> { x: T, y: T }\n\n# impl Point<i32> {\n#   fn f(&self) -> &i32 { &self.y }\n# }\n\n# impl<T> Point<T> {\n#   fn f(&self) -> &T { &self.x }\n# }\n\n# fn main() {\n#   let p: Point<i32> = Point { x: 1, y: 2 };\n#   println!("{}", p.f());\n# }\n# """\n# answer.doesCompile = false\n# answer.lineNumber = 8\n# context = """\n# These definitions of `f` conflict, and there is no way for Rust to determine which `f` should be used when `p.f()` is called. Therefore this is a compiler error.\n# """\n\n# [[questions]]\n# type = "Tracing"\n# prompt.program = """\n# fn clonable<T: Clone>(t: T) -> impl Clone { t }\n\n# fn main() {\n#   let s = String::from("hello");\n#   let s2 = clonable(s);\n#   println!("{}", s2.clone());\n# }\n# """\n# answer.doesCompile = false\n# answer.lineNumber = 6\n# context = """\n# Because `clonable` returns `impl Clone`, then we only know that `s2` is *some* type that implements `Clone`, \n# not that it is a `String` (or any type that implements `Display`). Therefore we cannot print `s2`.\n# """';
+const questionsToml = '[[questions]]\ntype = "Tracing"\nprompt.program = """\nfn main() {\n  let mut v = vec![1, 2, 3];\n  let mut v2 = Vec::new();\n  for i in &mut v {\n    v2.push(i);\n  }\n  *v2[0] = 5;\n\n  let a = *v2[0];\n  let b = v[0];\n  println!("{a} {b}");\n}\n"""\nanswer.doesCompile = true\nanswer.stdout = "5 5"\ncontext = """\n`i` has type `&mut i32`, meaning it is a pointer to a number within `v`. So if we push `i` into `v2`, then `v2` contains pointers to `v`. Therefore\nmutating `v2[0]` actually mutates `v[0]`.\n"""\n\n[[questions]]\ntype = "Tracing"\nprompt.program = """\n#[derive(Debug)]\nenum Either {\n  Left(usize),\n  Right(String)\n}\n\nfn main() {\n  let x = Either::Right(String::from("Hello world"));\n  let value = match x {\n    Either::Left(n) \u21D2 n,\n    Either::Right(s) \u21D2 s.len()\n  };\n  println!("{x:?} {value}");\n}\n"""\nanswer.doesCompile = false\nanswer.lineNumber = 13\ncontext = """\nA match moves its input, so `x` cannot be used in the `println`.\n"""\n\n[[questions]]\ntype = "MultipleChoice"\nprompt.prompt = """\nConsider the variables `s2` and `s3` in the following program. These two variables will be located in memory within the stack frame for `main`. Each variable has a size in memory on the stack, *not* including the size of pointed data. Which statement is true about the sizes of `s2` and `s3`?\n\n```\nfn main() {\n  let s = String::from("hello");\n  let s2: &String = &s;\n  let s3: &str = &s;\n}\n```\n"""\nprompt.choices = [\n  "`s3` has more bytes than `s2`",\n  "`s3` has the same number of bytes as `s2`",\n  "`s3` has fewer bytes than `s2`"\n]\nanswer.answer = 0\ncontext = """\nThe type `&String` is a normal reference consisting of a single pointer, so 8 bytes on a 64-bit architecture. The type `&str` is a special slice reference which consists of a pointer *and* a length, so 16 bytes. Therefore `s3` of type `&str` uses more memory than `s2` of type `&String`. You can verify this yourself using [`std::mem::size_of`](https://doc.rust-lang.org/std/mem/fn.size_of.html), like so:\n\n```rust\nfn main() {\n  println!(\n    "&String={} &str={}",\n    std::mem::size_of::<&String>(),\n    std::mem::size_of::<&str>(),\n  );\n}\n```\n\nAlso, note that Rust will implicitly convert string references to either `&String` or `&str` based on the context of the reference. So the expression `&s` produces two different values based on the expected type of `&s`.\n"""\n\n\n[[questions]]\ntype = "ShortAnswer"\nprompt.prompt = """\nWhat is the maximum number of times a heap allocation could occur in this program? Write your answer in digits, e.g. 0 or 1.\n\n```\nlet s1 = String::from("tic");\nlet s2 = String::from("tac");\nlet s3 = String::from("toe");\n\nlet s = s1 + "-" + &s2 + "-" + &s3;\n```\n"""\nanswer.answer = "7"\ncontext = """\nOne allocation for each call to `String::from`, and one allocation for every time `+` is called.\n"""\n\n[[questions]]\ntype = "Tracing"\nprompt.program = """\nuse std::collections::HashMap;\nfn main() {\n  let mut h = HashMap::new();\n  for (i, c) in "hello!".chars().enumerate() {\n    h.entry(c).or_insert(Vec::new()).push(i);\n  }\n  let mut sum = 0;\n  for i in &h[&\'l\'] {\n    sum += i;\n  }\n  println!("{}", sum);\n}\n"""\nanswer.doesCompile = true\nanswer.stdout = "5"\ncontext = """\nThis program stores a vector of indexes for each occurrence of a given letter into a hashmap. \nThen it sums all the indexes for the letter \'l\', which occurs at indexes 2 and 3 in the string `"hello!"`.\n"""\n\n[[questions]]\ntype = "ShortAnswer"\nprompt.prompt = """\nImagine a Rust package with the following directory structure:\n\n```text\nfoobar\n\u251C\u2500\u2500 Cargo.toml\n\u2514\u2500\u2500 src/\n    \u251C\u2500\u2500 lib.rs\n    \u2514\u2500\u2500 engine/\n        \u251C\u2500\u2500 mod.rs\n        \u2514\u2500\u2500 analysis.rs\n```\n\nThe contents of each file are:\n\n\n```\n// engine/analysis.rs\npub fn run() {}\n```\n\n```\n// engine/mod.rs\nmod analysis;\npub use analysis::*;\n```\n\n```\n// lib.rs\npub mod engine;\n```\n\nSay that another Rust developer is using the `foobar` library crate in a separate package, and they want to call the `run` function.\nWhat is the path they would write?\n"""\nanswer.answer = "foobar::engine::run"\nanswer.alternatives = ["foobar::engine::run()"]\ncontext = """\nThe module tree generated by this directory structure is as follows:\n\n```text\nfoobar\n\u2514\u2500\u2500 engine\n    \u2514\u2500\u2500 run  \n```\n\nTherefore the path to `run` is `foobar::engine::run`.\n"""\n\n\n[[questions]]\ntype = "Tracing"\nprompt.program = """\nfn print_slice<T>(v: &[T]) {\n  for x in v {\n    println!("{x}");\n  }\n}\n\nfn main() {\n  print_slice(&[1, 2, 3]);\n}\n"""\nanswer.doesCompile = false\nanswer.lineNumber = 3\ncontext = """\nIf a type is generic (like `T`), we cannot assume anything about it, including the ability to turn it into a string. Therefore `println!("{x}")` is invalid\nbecause `x: &T`.\n"""\n\n[[questions]]\ntype = "MultipleChoice"\nprompt.prompt = """\nConsider the following un-annotated function signature.\n\n```\nstruct Foo<\'a> {\n  bar: &\'a i32\n}\n\nfn baz(f: &Foo) -> &i32 { /* ... */ }\n```\n\nWill Rust accept this function signature? If so, what lifetimes will it infer?\n"""\nprompt.choices = [\n  "Rust will reject this function signature",\n  """\n```\nfn baz(f: &Foo) -> &i32\n```\n  """,\n  """\n```\nfn baz<\'a>(f: &Foo<\'a>) -> &\'a i32\n```\n  """,\n  """\n```\nfn baz<\'a>(f: &\'a Foo) -> &\'a i32\n```\n  """,\n  """\n```\nfn baz<\'a, \'b>(f: &\'a Foo<\'b>) -> &\'a i32\n```\n  """,\n  """\n```\nfn baz<\'a, \'b>(f: &\'a Foo<\'b>) -> &\'b i32\n```\n  """\n]\nanswer.answer = 0\ncontext = """\nRust will not compile this program, because it is ambiguous whether the lifetime of the output is tied to\nthe lifetime of `&Foo` or the reference `Foo.bar`.\n"""\n\n\n[[questions]]\ntype = "Tracing"\nprompt.program = """\nstruct Point<T> { x: T, y: T }\n\nimpl Point<i32> {\n  fn f(&self) -> &i32 { &self.y }\n}\n\nimpl<T> Point<T> {\n  fn f(&self) -> &T { &self.x }\n}\n\nfn main() {\n  let p: Point<i32> = Point { x: 1, y: 2 };\n  println!("{}", p.f());\n}\n"""\nanswer.doesCompile = false\nanswer.lineNumber = 8\ncontext = """\nThese definitions of `f` conflict, and there is no way for Rust to determine which `f` should be used when `p.f()` is called. Therefore this is a compiler error.\n"""\n\n[[questions]]\ntype = "Tracing"\nprompt.program = """\nfn clonable<T: Clone>(t: T) -> impl Clone { t }\n\nfn main() {\n  let s = String::from("hello");\n  let s2 = clonable(s);\n  println!("{}", s2.clone());\n}\n"""\nanswer.doesCompile = false\nanswer.lineNumber = 6\ncontext = """\nBecause `clonable` returns `impl Clone`, then we only know that `s2` is *some* type that implements `Clone`, \nnot that it is a `String` (or any type that implements `Display`). Therefore we cannot print `s2`.\n"""';
 const index = "";
+let Intro = ({
+  next
+}) => {
+  return /* @__PURE__ */ jsxs("div", {
+    className: "intro",
+    children: [/* @__PURE__ */ jsx("h1", {
+      children: "Rust Experiment: Quiz Think-aloud"
+    }), /* @__PURE__ */ jsxs("p", {
+      children: ["This page is a 20-minute experiment by Brown University researchers", " ", /* @__PURE__ */ jsx("a", {
+        href: "https://willcrichton.net/",
+        children: "Will Crichton"
+      }), " and", " ", /* @__PURE__ */ jsx("a", {
+        href: "https://cs.brown.edu/~sk/",
+        children: "Shriram Krishnamurthi"
+      }), ". In this experiment, you will answer 10 multiple-choice questions about the Rust programming language."]
+    }), /* @__PURE__ */ jsx("p", {
+      children: 'The goal of this experiment is to understand your thought process while answering each question. You will be asked to "think aloud", or verbally explain your thoughts during the experiment. For example, if you pick a particular answer, you should explain why you picked that one and not a different one. Your screen and microphone will be recorded for the duration of the experiment.'
+    }), /* @__PURE__ */ jsxs("p", {
+      children: [/* @__PURE__ */ jsx("strong", {
+        children: "Prerequisites:"
+      }), /* @__PURE__ */ jsxs("ul", {
+        children: [/* @__PURE__ */ jsxs("li", {
+          children: [" ", "You must have read", " ", /* @__PURE__ */ jsx("a", {
+            href: "https://doc.rust-lang.org/book/",
+            target: "_blank",
+            rel: "noreferrer",
+            children: /* @__PURE__ */ jsx("em", {
+              children: "The Rust Programming Language"
+            })
+          }), " ", "at least until Chapter 10, OR you must have at least a basic familiarity with Rust including ownership and traits."]
+        }), /* @__PURE__ */ jsx("li", {
+          children: "You must have a working microphone, and you should participate in a quiet space."
+        })]
+      })]
+    }), /* @__PURE__ */ jsxs("p", {
+      children: [/* @__PURE__ */ jsx("button", {
+        style: {
+          marginRight: "20px"
+        },
+        onClick: next,
+        children: "I understand and want to participate"
+      }), /* @__PURE__ */ jsx("button", {
+        onClick: () => alert("Please close this tab."),
+        children: "I do not want to participate"
+      })]
+    })]
+  });
+};
 let App = () => {
   let [start, setStart] = react.exports.useState();
   let uuid = react.exports.useMemo(() => v4(), []);
   let questions = toml.parse(questionsToml);
   let [recorder, setRecorder] = react.exports.useState();
-  let [stage, setStage] = react.exports.useState("start");
+  let [stage, setStage] = react.exports.useState("setup");
   let [quizFinished, setQuizFinished] = react.exports.useState(false);
   let onFinish = (answers) => {
     let results = {
@@ -41170,7 +41220,9 @@ let App = () => {
   };
   return /* @__PURE__ */ jsx("div", {
     className: "app",
-    children: stage == "setup" ? /* @__PURE__ */ jsx(RecordingSetup, {
+    children: stage == "start" ? /* @__PURE__ */ jsx(Intro, {
+      next: () => setStage("setup")
+    }) : stage == "setup" ? /* @__PURE__ */ jsx(RecordingSetup, {
       next: () => setStage("quiz"),
       registerRecorder: (recorder2) => {
         setRecorder(recorder2);
@@ -41181,6 +41233,10 @@ let App = () => {
         children: ["Next, answer each question in the quiz below.", " ", /* @__PURE__ */ jsx("strong", {
           children: "Remember to think aloud as you determine the answer!"
         }), " ", 'After completing the quiz, feel free to review your answers if you want. Then scroll to the bottom and click "Next".']
+      }), /* @__PURE__ */ jsxs("p", {
+        children: [/* @__PURE__ */ jsx("strong", {
+          children: "Do not stop sharing your screen until the experiment has concluded."
+        }), " ", "The recording will automatically stop."]
       }), /* @__PURE__ */ jsx(e7, {
         name: "trpl-evaluator",
         quiz: questions,
