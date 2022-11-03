@@ -41201,7 +41201,7 @@ let App = () => {
   let uuid = react.exports.useMemo(() => v4(), []);
   let questions = toml.parse(questionsToml);
   let [recorder, setRecorder] = react.exports.useState();
-  let [stage, setStage] = react.exports.useState("setup");
+  let [stage, setStage] = react.exports.useState("start");
   let [quizFinished, setQuizFinished] = react.exports.useState(false);
   let onFinish = (answers) => {
     let results = {
