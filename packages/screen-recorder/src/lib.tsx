@@ -71,11 +71,15 @@ export class Recorder {
   private mediaRecorder: MediaRecorder;
   readonly extension: string;
 
-  constructor(videoStream: MediaStream) {
-    let pair = MIME_TYPES.find(([type]) => MediaRecorder.isTypeSupported(type));
+  constructor(videoStream: MediaStream, audioStream: MediaStream) {
+    let audioTrack = audioStream.getTracks()[0];
+    videoStream.addTrack(audioTrack);
+    audioStream.removeTrack(audioTrack);
 
+    let pair = MIME_TYPES.find(([type]) => MediaRecorder.isTypeSupported(type));
     if (!pair) throw new Error("No supported video type!");
     let [mimeType, ext] = pair;
+
     this.extension = ext;
     console.debug(`Mime type: ${mimeType}`);
 
@@ -83,6 +87,21 @@ export class Recorder {
     this.mediaRecorder.addEventListener("dataavailable", e => {
       this.chunks.push(e.data);
     });
+
+    let videoTrack = videoStream.getVideoTracks()[0];
+    videoTrack.addEventListener("ended", async () => {
+      // this.mediaRecorder.stop();
+      // let newVideoStream = await navigator.mediaDevices.getDisplayMedia({
+      //   video: true,
+      // } as any);
+      // this.mediaRecorder.stream.removeTrack(videoTrack);
+      // this.mediaRecorder.stream.addTrack(newVideoStream.getVideoTracks()[0]);
+      // this.mediaRecorder.start();
+
+      document.getElementById("root")!.innerHTML =
+        "<strong>Error:</strong> you cannot stop the screen recording during the experiment (it is an unrecoverable error right now). Please refresh the page and restart the experiment.";
+    });
+
     this.mediaRecorder.start();
   }
 
@@ -139,16 +158,7 @@ export let RecordingSetup = ({
 
   let finish = () => {
     if (!videoStream || !audioStream) throw new Error("Unreachable");
-
-    let audioTrack = audioStream.getTracks()[0];
-    videoStream.addTrack(audioTrack);
-    audioStream.removeTrack(audioTrack);
-
-    videoStream.getVideoTracks()[0].addEventListener("ended", () => {
-      // TODO: handle the case where user cancels recording
-    });
-
-    registerRecorder(new Recorder(videoStream!));
+    registerRecorder(new Recorder(videoStream, audioStream));
     next();
   };
 
@@ -161,11 +171,13 @@ export let RecordingSetup = ({
   }, [videoStream, audioStream]);
 
   return (
-    <div className="container">
+    <div className="container recording-setup">
       <p>
         First, we need to setup the recording. Click the button below to enable
-        screen recording, and <strong>select the browser window</strong> (not
-        the tab!) to record as shown in the screenshot below.
+        screen recording, and{" "}
+        <strong>select the screen containing this browser</strong> (not the
+        tab!) to record. The screenshot below shows how this should look in
+        Google Chrome.
       </p>
       <div>
         <img

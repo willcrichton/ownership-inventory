@@ -45,243 +45,243 @@ context = """
 A match moves its input, so `x` cannot be used in the `println`.
 """
 
-# [[questions]]
-# type = "MultipleChoice"
-# prompt.prompt = """
-# Consider the variables `s2` and `s3` in the following program. These two variables will be located in memory within the stack frame for `main`. Each variable has a size in memory on the stack, *not* including the size of pointed data. Which statement is true about the sizes of `s2` and `s3`?
+[[questions]]
+type = "MultipleChoice"
+prompt.prompt = """
+Consider the variables `s2` and `s3` in the following program. These two variables will be located in memory within the stack frame for `main`. Each variable has a size in memory on the stack, *not* including the size of pointed data. Which statement is true about the sizes of `s2` and `s3`?
 
-# ```
-# fn main() {
-#   let s = String::from("hello");
-#   let s2: &String = &s;
-#   let s3: &str = &s;
-# }
-# ```
-# """
-# prompt.choices = [
-#   "`s3` has more bytes than `s2`",
-#   "`s3` has the same number of bytes as `s2`",
-#   "`s3` has fewer bytes than `s2`"
-# ]
-# answer.answer = 0
-# context = """
-# The type `&String` is a normal reference consisting of a single pointer, so 8 bytes on a 64-bit architecture. The type `&str` is a special slice reference which consists of a pointer *and* a length, so 16 bytes. Therefore `s3` of type `&str` uses more memory than `s2` of type `&String`. You can verify this yourself using [`std::mem::size_of`](https://doc.rust-lang.org/std/mem/fn.size_of.html), like so:
+```
+fn main() {
+  let s = String::from("hello");
+  let s2: &String = &s;
+  let s3: &str = &s;
+}
+```
+"""
+prompt.choices = [
+  "`s3` has more bytes than `s2`",
+  "`s3` has the same number of bytes as `s2`",
+  "`s3` has fewer bytes than `s2`"
+]
+answer.answer = 0
+context = """
+The type `&String` is a normal reference consisting of a single pointer, so 8 bytes on a 64-bit architecture. The type `&str` is a special slice reference which consists of a pointer *and* a length, so 16 bytes. Therefore `s3` of type `&str` uses more memory than `s2` of type `&String`. You can verify this yourself using [`std::mem::size_of`](https://doc.rust-lang.org/std/mem/fn.size_of.html), like so:
 
-# ```rust
-# fn main() {
-#   println!(
-#     "&String={} &str={}",
-#     std::mem::size_of::<&String>(),
-#     std::mem::size_of::<&str>(),
-#   );
-# }
-# ```
+```rust
+fn main() {
+  println!(
+    "&String={} &str={}",
+    std::mem::size_of::<&String>(),
+    std::mem::size_of::<&str>(),
+  );
+}
+```
 
-# Also, note that Rust will implicitly convert string references to either `&String` or `&str` based on the context of the reference. So the expression `&s` produces two different values based on the expected type of `&s`.
-# """
-
-
-# [[questions]]
-# type = "ShortAnswer"
-# prompt.prompt = """
-# What is the maximum number of times a heap allocation could occur in this program? Write your answer in digits, e.g. 0 or 1.
-
-# ```
-# let s1 = String::from("tic");
-# let s2 = String::from("tac");
-# let s3 = String::from("toe");
-
-# let s = s1 + "-" + &s2 + "-" + &s3;
-# ```
-# """
-# answer.answer = "7"
-# context = """
-# One allocation for each call to `String::from`, and one allocation for every time `+` is called.
-# """
-
-# [[questions]]
-# type = "Tracing"
-# prompt.program = """
-# use std::collections::HashMap;
-# fn main() {
-#   let mut h = HashMap::new();
-#   for (i, c) in "hello!".chars().enumerate() {
-#     h.entry(c).or_insert(Vec::new()).push(i);
-#   }
-#   let mut sum = 0;
-#   for i in &h[&'l'] {
-#     sum += i;
-#   }
-#   println!("{}", sum);
-# }
-# """
-# answer.doesCompile = true
-# answer.stdout = "5"
-# context = """
-# This program stores a vector of indexes for each occurrence of a given letter into a hashmap. 
-# Then it sums all the indexes for the letter 'l', which occurs at indexes 2 and 3 in the string `"hello!"`.
-# """
-
-# [[questions]]
-# type = "ShortAnswer"
-# prompt.prompt = """
-# Imagine a Rust package with the following directory structure:
-
-# ```text
-# foobar
-# ├── Cargo.toml
-# └── src/
-#     ├── lib.rs
-#     └── engine/
-#         ├── mod.rs
-#         └── analysis.rs
-# ```
-
-# The contents of each file are:
+Also, note that Rust will implicitly convert string references to either `&String` or `&str` based on the context of the reference. So the expression `&s` produces two different values based on the expected type of `&s`.
+"""
 
 
-# ```
-# // engine/analysis.rs
-# pub fn run() {}
-# ```
+[[questions]]
+type = "ShortAnswer"
+prompt.prompt = """
+What is the maximum number of times a heap allocation could occur in this program? Write your answer in digits, e.g. 0 or 1.
 
-# ```
-# // engine/mod.rs
-# mod analysis;
-# pub use analysis::*;
-# ```
+```
+let s1 = String::from("tic");
+let s2 = String::from("tac");
+let s3 = String::from("toe");
 
-# ```
-# // lib.rs
-# pub mod engine;
-# ```
+let s = s1 + "-" + &s2 + "-" + &s3;
+```
+"""
+answer.answer = "7"
+context = """
+One allocation for each call to `String::from`, and one allocation for every time `+` is called.
+"""
 
-# Say that another Rust developer is using the `foobar` library crate in a separate package, and they want to call the `run` function.
-# What is the path they would write?
-# """
-# answer.answer = "foobar::engine::run"
-# answer.alternatives = ["foobar::engine::run()"]
-# context = """
-# The module tree generated by this directory structure is as follows:
+[[questions]]
+type = "Tracing"
+prompt.program = """
+use std::collections::HashMap;
+fn main() {
+  let mut h = HashMap::new();
+  for (i, c) in "hello!".chars().enumerate() {
+    h.entry(c).or_insert(Vec::new()).push(i);
+  }
+  let mut sum = 0;
+  for i in &h[&'l'] {
+    sum += i;
+  }
+  println!("{}", sum);
+}
+"""
+answer.doesCompile = true
+answer.stdout = "5"
+context = """
+This program stores a vector of indexes for each occurrence of a given letter into a hashmap. 
+Then it sums all the indexes for the letter 'l', which occurs at indexes 2 and 3 in the string `"hello!"`.
+"""
 
-# ```text
-# foobar
-# └── engine
-#     └── run  
-# ```
+[[questions]]
+type = "ShortAnswer"
+prompt.prompt = """
+Imagine a Rust package with the following directory structure:
 
-# Therefore the path to `run` is `foobar::engine::run`.
-# """
+```text
+foobar
+├── Cargo.toml
+└── src/
+    ├── lib.rs
+    └── engine/
+        ├── mod.rs
+        └── analysis.rs
+```
 
-
-# [[questions]]
-# type = "Tracing"
-# prompt.program = """
-# fn print_slice<T>(v: &[T]) {
-#   for x in v {
-#     println!("{x}");
-#   }
-# }
-
-# fn main() {
-#   print_slice(&[1, 2, 3]);
-# }
-# """
-# answer.doesCompile = false
-# answer.lineNumber = 3
-# context = """
-# If a type is generic (like `T`), we cannot assume anything about it, including the ability to turn it into a string. Therefore `println!("{x}")` is invalid
-# because `x: &T`.
-# """
-
-# [[questions]]
-# type = "MultipleChoice"
-# prompt.prompt = """
-# Consider the following un-annotated function signature.
-
-# ```
-# struct Foo<'a> {
-#   bar: &'a i32
-# }
-
-# fn baz(f: &Foo) -> &i32 { /* ... */ }
-# ```
-
-# Will Rust accept this function signature? If so, what lifetimes will it infer?
-# """
-# prompt.choices = [
-#   "Rust will reject this function signature",
-#   """
-# ```
-# fn baz(f: &Foo) -> &i32
-# ```
-#   """,
-#   """
-# ```
-# fn baz<'a>(f: &Foo<'a>) -> &'a i32
-# ```
-#   """,
-#   """
-# ```
-# fn baz<'a>(f: &'a Foo) -> &'a i32
-# ```
-#   """,
-#   """
-# ```
-# fn baz<'a, 'b>(f: &'a Foo<'b>) -> &'a i32
-# ```
-#   """,
-#   """
-# ```
-# fn baz<'a, 'b>(f: &'a Foo<'b>) -> &'b i32
-# ```
-#   """
-# ]
-# answer.answer = 0
-# context = """
-# Rust will not compile this program, because it is ambiguous whether the lifetime of the output is tied to
-# the lifetime of `&Foo` or the reference `Foo.bar`.
-# """
+The contents of each file are:
 
 
-# [[questions]]
-# type = "Tracing"
-# prompt.program = """
-# struct Point<T> { x: T, y: T }
+```
+// engine/analysis.rs
+pub fn run() {}
+```
 
-# impl Point<i32> {
-#   fn f(&self) -> &i32 { &self.y }
-# }
+```
+// engine/mod.rs
+mod analysis;
+pub use analysis::*;
+```
 
-# impl<T> Point<T> {
-#   fn f(&self) -> &T { &self.x }
-# }
+```
+// lib.rs
+pub mod engine;
+```
 
-# fn main() {
-#   let p: Point<i32> = Point { x: 1, y: 2 };
-#   println!("{}", p.f());
-# }
-# """
-# answer.doesCompile = false
-# answer.lineNumber = 8
-# context = """
-# These definitions of `f` conflict, and there is no way for Rust to determine which `f` should be used when `p.f()` is called. Therefore this is a compiler error.
-# """
+Say that another Rust developer is using the `foobar` library crate in a separate package, and they want to call the `run` function.
+What is the path they would write?
+"""
+answer.answer = "foobar::engine::run"
+answer.alternatives = ["foobar::engine::run()"]
+context = """
+The module tree generated by this directory structure is as follows:
 
-# [[questions]]
-# type = "Tracing"
-# prompt.program = """
-# fn clonable<T: Clone>(t: T) -> impl Clone { t }
+```text
+foobar
+└── engine
+    └── run  
+```
 
-# fn main() {
-#   let s = String::from("hello");
-#   let s2 = clonable(s);
-#   println!("{}", s2.clone());
-# }
-# """
-# answer.doesCompile = false
-# answer.lineNumber = 6
-# context = """
-# Because `clonable` returns `impl Clone`, then we only know that `s2` is *some* type that implements `Clone`, 
-# not that it is a `String` (or any type that implements `Display`). Therefore we cannot print `s2`.
-# """
+Therefore the path to `run` is `foobar::engine::run`.
+"""
+
+
+[[questions]]
+type = "Tracing"
+prompt.program = """
+fn print_slice<T>(v: &[T]) {
+  for x in v {
+    println!("{x}");
+  }
+}
+
+fn main() {
+  print_slice(&[1, 2, 3]);
+}
+"""
+answer.doesCompile = false
+answer.lineNumber = 3
+context = """
+If a type is generic (like `T`), we cannot assume anything about it, including the ability to turn it into a string. Therefore `println!("{x}")` is invalid
+because `x: &T`.
+"""
+
+[[questions]]
+type = "MultipleChoice"
+prompt.prompt = """
+Consider the following un-annotated function signature.
+
+```
+struct Foo<'a> {
+  bar: &'a i32
+}
+
+fn baz(f: &Foo) -> &i32 { /* ... */ }
+```
+
+Will Rust accept this function signature? If so, what lifetimes will it infer?
+"""
+prompt.choices = [
+  "Rust will reject this function signature",
+  """
+```
+fn baz(f: &Foo) -> &i32
+```
+  """,
+  """
+```
+fn baz<'a>(f: &Foo<'a>) -> &'a i32
+```
+  """,
+  """
+```
+fn baz<'a>(f: &'a Foo) -> &'a i32
+```
+  """,
+  """
+```
+fn baz<'a, 'b>(f: &'a Foo<'b>) -> &'a i32
+```
+  """,
+  """
+```
+fn baz<'a, 'b>(f: &'a Foo<'b>) -> &'b i32
+```
+  """
+]
+answer.answer = 0
+context = """
+Rust will not compile this program, because it is ambiguous whether the lifetime of the output is tied to
+the lifetime of `&Foo` or the reference `Foo.bar`.
+"""
+
+
+[[questions]]
+type = "Tracing"
+prompt.program = """
+struct Point<T> { x: T, y: T }
+
+impl Point<i32> {
+  fn f(&self) -> &i32 { &self.y }
+}
+
+impl<T> Point<T> {
+  fn f(&self) -> &T { &self.x }
+}
+
+fn main() {
+  let p: Point<i32> = Point { x: 1, y: 2 };
+  println!("{}", p.f());
+}
+"""
+answer.doesCompile = false
+answer.lineNumber = 8
+context = """
+These definitions of `f` conflict, and there is no way for Rust to determine which `f` should be used when `p.f()` is called. Therefore this is a compiler error.
+"""
+
+[[questions]]
+type = "Tracing"
+prompt.program = """
+fn clonable<T: Clone>(t: T) -> impl Clone { t }
+
+fn main() {
+  let s = String::from("hello");
+  let s2 = clonable(s);
+  println!("{}", s2.clone());
+}
+"""
+answer.doesCompile = false
+answer.lineNumber = 6
+context = """
+Because `clonable` returns `impl Clone`, then we only know that `s2` is *some* type that implements `Clone`, 
+not that it is a `String` (or any type that implements `Display`). Therefore we cannot print `s2`.
+"""

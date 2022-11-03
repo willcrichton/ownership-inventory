@@ -54,3 +54,13 @@ pre, code {
   font-size: 24px;
   cursor: pointer;  
 }
+
+.intro {
+  li {
+    margin-block-end: 1em;
+  }
+
+  button {
+    font-size: 100%;
+  }
+}
