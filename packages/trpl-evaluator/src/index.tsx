@@ -114,7 +114,7 @@ export let App = () => {
               Do not stop sharing your screen until the experiment has
               concluded.
             </strong>{" "}
-            The recording will automatically stop.
+            We will automatically stop the recording for you.
           </p>
           <QuizView
             name="trpl-evaluator"
