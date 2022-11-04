@@ -41236,7 +41236,7 @@ let App = () => {
       }), /* @__PURE__ */ jsxs("p", {
         children: [/* @__PURE__ */ jsx("strong", {
           children: "Do not stop sharing your screen until the experiment has concluded."
-        }), " ", "The recording will automatically stop."]
+        }), " ", "We will automatically stop the recording for you."]
       }), /* @__PURE__ */ jsx(e7, {
         name: "trpl-evaluator",
         quiz: questions,
