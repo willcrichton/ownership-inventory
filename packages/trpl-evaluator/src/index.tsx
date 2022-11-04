@@ -28,6 +28,7 @@ let Intro = ({ next }: { next: () => void }) => {
         different one. Your screen and microphone will be recorded for the
         duration of the experiment.
       </p>
+      <p>You will not be compensated for participating in this experiment.</p>
       <p>
         <strong>Prerequisites:</strong>
         <ul>
