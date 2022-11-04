@@ -41165,6 +41165,8 @@ let Intro = ({
       }), ". In this experiment, you will answer 10 multiple-choice questions about the Rust programming language."]
     }), /* @__PURE__ */ jsx("p", {
       children: 'The goal of this experiment is to understand your thought process while answering each question. You will be asked to "think aloud", or verbally explain your thoughts during the experiment. For example, if you pick a particular answer, you should explain why you picked that one and not a different one. Your screen and microphone will be recorded for the duration of the experiment.'
+    }), /* @__PURE__ */ jsx("p", {
+      children: "You will not be compensated for participating in this experiment."
     }), /* @__PURE__ */ jsxs("p", {
       children: [/* @__PURE__ */ jsx("strong", {
         children: "Prerequisites:"
