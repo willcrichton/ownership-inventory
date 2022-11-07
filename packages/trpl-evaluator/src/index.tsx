@@ -88,6 +88,14 @@ export let App = () => {
     setQuizFinished(true);
   };
 
+  let nextButton = quizFinished ? (
+    <p>
+      <button className="next" onClick={() => setStage("end")}>
+        Next
+      </button>
+    </p>
+  ) : null;
+
   return (
     <div className="app">
       {stage == "start" ? (
@@ -108,7 +116,7 @@ export let App = () => {
               Remember to think aloud as you determine the answer!
             </strong>{" "}
             After completing the quiz, feel free to review your answers if you
-            want. Then scroll to the bottom and click "Next".
+            want. Then click "Next".
           </p>
           <p>
             <strong>
@@ -117,18 +125,13 @@ export let App = () => {
             </strong>{" "}
             We will automatically stop the recording for you.
           </p>
+          {nextButton}
           <QuizView
             name="trpl-evaluator"
             quiz={questions}
             onFinish={onFinish}
           />
-          {quizFinished ? (
-            <p>
-              <button className="next" onClick={() => setStage("end")}>
-                Next
-              </button>
-            </p>
-          ) : null}
+          {nextButton}
         </>
       ) : (
         <Outro
