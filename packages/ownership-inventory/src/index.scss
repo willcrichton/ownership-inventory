@@ -1,4 +1,5 @@
 @import "normalize.css/normalize.css";
+@import "intro.js/introjs.css";
 
 :root {
   font-family: Helvetica, Arial, sans-serif;
@@ -10,11 +11,15 @@ body {
 }
 
 .container {
-  width: 800px;
+  width: 820px;
 }
 
 h1 {
   margin-top: 0;
+}
+
+input[type=email] {
+  width: 250px; 
 }
 
 .problem {
@@ -67,4 +72,12 @@ pre {
   &.error {
     color: #b40000;
   }
+}
+
+.introjs-tooltip-header {
+  display: none;  
+}
+
+.introjs-tooltipReferenceLayer code {
+  font-family: Inconsolata, monospace;
 }

@@ -10,12 +10,11 @@ export default defineConfig({
     OMT(),
     react(),
     {
-      name: "No",
+      name: "StaticFiles",
       closeBundle() {
         [
           "node_modules/coi-serviceworker/coi-serviceworker.js",
           "node_modules/@wcrichto/rust-editor/dist/editor.worker.js",
-          "node_modules/@wcrichto/screen-recorder/dist/vumeter-worklet.js",
         ].forEach(f => {
           fs.copyFileSync(f, path.join("dist", path.basename(f)));
         });

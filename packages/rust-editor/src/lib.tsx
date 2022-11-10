@@ -1,4 +1,4 @@
-// @ts-nocheck
+//@ts-nocheck
 import "monaco-editor/esm/vs/editor/browser/coreCommands";
 import "monaco-editor/esm/vs/editor/browser/widget/codeEditorWidget";
 import "monaco-editor/esm/vs/editor/browser/widget/diffEditorWidget";
@@ -52,18 +52,26 @@ import "monaco-editor/esm/vs/editor/standalone/browser/quickAccess/standaloneGot
 import "monaco-editor/esm/vs/editor/standalone/browser/quickAccess/standaloneHelpQuickAccess";
 import "monaco-editor/esm/vs/editor/standalone/browser/referenceSearch/standaloneReferenceSearch";
 import "monaco-editor/esm/vs/editor/standalone/browser/toggleHighContrast/toggleHighContrast";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 
 import fake_alloc from "./fake_alloc.rs?raw";
 import fake_core from "./fake_core.rs?raw";
 import fake_std from "./fake_std.rs?raw";
 import { conf, grammar } from "./rust-grammar";
 
-const MODE_ID = "rust";
+const MODE_ID = "rust-ra";
 let globalSetup = () => {
   self.MonacoEnvironment = {
     getWorkerUrl: () => "./editor.worker.js",
   };
+
+  monaco.languages.register({
+    id: "rust",
+  });
+  monaco.languages.onLanguage("rust", async () => {
+    monaco.languages.setLanguageConfiguration("rust", conf);
+    monaco.languages.setMonarchTokensProvider("rust", grammar);
+  });
 
   monaco.languages.register({
     id: MODE_ID,
@@ -88,10 +96,14 @@ export class RustAnalyzer {
     console.debug("Initializing Rust Analyzer...");
     let ra = new RustAnalyzer(state);
     ra.registerRA();
-    await state.init("fn main(){}", fake_std, fake_core, fake_alloc);
+    await ra.init();
 
     console.debug("Rust Analyzer ready!");
     return ra;
+  }
+
+  async init() {
+    await this.state.init("fn main(){}", fake_std, fake_core, fake_alloc);
   }
 
   async update(model: monaco.editor.ITextModel) {
@@ -314,7 +326,7 @@ export let Editor: React.FC<{
   disabled?: boolean;
 }> = ({ ra, contents, onChange, disabled }) => {
   let ref = useRef<HTMLDivElement>(null);
-  let [model] = useState(() => monaco.editor.createModel(contents, MODE_ID));
+  let model = useMemo(() => monaco.editor.createModel(contents, "rust"), []);
   let [editor, setEditor] = useState<
     monaco.editor.IStandaloneCodeEditor | undefined
   >(undefined);
@@ -333,24 +345,40 @@ export let Editor: React.FC<{
     let lineHeight = editor.getOption(monaco.editor.EditorOption.lineHeight);
     let lineCount = model.getLineCount();
     let desiredCount = Math.max(lineCount, 8);
-    let height = editor.getTopForLineNumber(desiredCount + 1) + lineHeight;
+    let height = lineHeight * desiredCount;
     ref.current!.style.height = `${height}px`;
     editor.layout();
+
+    let relayout = () => editor.layout();
+    window.addEventListener("resize", relayout, false);
+
+    let disposers = [
+      () => window.removeEventListener("resize", relayout, false),
+    ];
 
     if (onChange) {
       let dispose = model.onDidChangeContent(() => {
         onChange!(model.getValue());
       });
-      return dispose.dispose;
+      disposers.push(dispose.dispose);
     }
-  }, [model]);
+
+    return () => disposers.forEach(f => f());
+  }, []);
 
   useEffect(() => {
-    if (!ra) return;
+    if (!ra) {
+      monaco.editor.setModelLanguage(model, "rust");
+      return;
+    } else {
+      monaco.editor.setModelLanguage(model, MODE_ID);
+    }
+
     ra.update(model);
     let dipose = model.onDidChangeContent(() => ra.update(model));
+
     return dipose.dispose;
-  }, [ra, model]);
+  }, [ra]);
 
   useEffect(() => {
     if (!editor) return;
