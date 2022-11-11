@@ -324,7 +324,8 @@ export let Editor: React.FC<{
   contents: string;
   onChange?: (contents: string) => void;
   disabled?: boolean;
-}> = ({ ra, contents, onChange, disabled }) => {
+  exactHeight?: boolean;
+}> = ({ ra, contents, onChange, disabled, exactHeight }) => {
   let ref = useRef<HTMLDivElement>(null);
   let model = useMemo(() => monaco.editor.createModel(contents, "rust"), []);
   let [editor, setEditor] = useState<
@@ -344,8 +345,13 @@ export let Editor: React.FC<{
 
     let lineHeight = editor.getOption(monaco.editor.EditorOption.lineHeight);
     let lineCount = model.getLineCount();
-    let desiredCount = Math.max(lineCount, 8);
-    let height = lineHeight * desiredCount;
+    let height: number;
+    if (exactHeight) {
+      height = editor.getTopForLineNumber(lineCount + 1) + lineHeight;
+    } else {
+      let desiredCount = Math.max(lineCount, 8);
+      height = lineHeight * desiredCount;
+    }
     ref.current!.style.height = `${height}px`;
     editor.layout();
 

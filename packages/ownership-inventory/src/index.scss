@@ -74,10 +74,54 @@ pre {
   }
 }
 
+.introjs-tooltip {
+  min-width: 300px;
+  max-width: 400px;
+}
+
 .introjs-tooltip-header {
   display: none;  
 }
 
-.introjs-tooltipReferenceLayer code {
-  font-family: Inconsolata, monospace;
+.introjs-tooltipReferenceLayer {
+  font-size: 120%;
+  code {
+    font-family: Inconsolata, monospace;
+  }
+}
+
+
+.info-wrapper {
+  display: inline-block;
+  position: relative;
+}
+.info {
+  display: inline-block;
+  color: #999;
+  border: 1px solid #999;
+  border-radius: 50%;
+  vertical-align: middle;
+  font-size: 12px;
+  width: 17px;
+  height: 17px;
+  font-weight: bold;
+  line-height: 15px;
+  text-align: center;
+  cursor: pointer;
+
+  &:hover {
+    color: #333;
+    border-color: #333;
+  }
+
+  &::before {
+    content: "i";
+    font-family: Inconsolata, monospace;
+    vertical-align: middle;
+  }
+}
+
+.outro textarea {
+  width: 500px;
+  height: 5em;
 }

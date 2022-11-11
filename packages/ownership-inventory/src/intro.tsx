@@ -2,14 +2,14 @@ import React, { useState } from "react";
 import ReactMarkdown from "react-markdown";
 
 const INTRO = `
-**Summary:** This page is a 45-minute experiment by Brown University researchers 
+**Summary:** This page is a 1-hour experiment by Brown University researchers 
 [Will Crichton](https://willcrichton.net/) and [Shriram Krishnamurthi](https://cs.brown.edu/~sk/).
 In this experiment, you will answer a sequence of open-ended questions about ownership 
 in Rust. The goal of this experiment is to understand how you think about ownership. 
 We will use these results to inform the design of our 
 [Rust Book Experiment](https://rust-book.cs.brown.edu/).
 
-**Compensation:** you will be compensated with a $15 Amazon gift card for completing
+**Compensation:** you will be compensated with a $20 Amazon gift card for completing
 this experiment in good faith.
 
 **Prerequisites:** you MUST have read [The Rust Programming Language](https://doc.rust-lang.org/book/),

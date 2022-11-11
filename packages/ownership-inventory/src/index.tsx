@@ -1,6 +1,6 @@
 import { RustAnalyzer } from "@wcrichto/rust-editor";
 import _ from "lodash";
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import ReactDOM from "react-dom/client";
 import * as uuid from "uuid";
 
@@ -44,6 +44,44 @@ fn remove_zeros(v: &mut Vec<i32>) {
 }
   `,
 ];
+
+let Outro = () => {
+  let textarea = useRef<HTMLTextAreaElement>(null);
+  let [submitted, setSubmitted] = useState(false);
+  let submit = () => {
+    fetch("https://mindover.computer/ownership-inventory-feedback", {
+      headers: {
+        "Content-Type": "application/json",
+      },
+      method: "POST",
+      mode: "cors",
+      body: JSON.stringify({ feedback: textarea.current!.value }),
+    });
+    setSubmitted(true);
+  };
+  return (
+    <div className="outro">
+      <p>
+        Thank you for your participation in the experiment! If you have any
+        feedback on the format of the experiment, please let us know:
+      </p>
+      <textarea
+        ref={textarea}
+        placeholder="Put your feedback here..."
+        disabled={submitted}
+      />
+      <p>
+        <button onClick={submit} disabled={submitted}>
+          Submit Feedback
+        </button>
+        {submitted ? " Feedback received. Thanks!" : null}
+      </p>
+      <p>
+        Otherwise, the experiment has concluded. You may close this tab now.
+      </p>
+    </div>
+  );
+};
 
 let App = () => {
   let id = useMemo(() => uuid.v4(), []);
@@ -127,10 +165,7 @@ let App = () => {
           }}
         />
       ) : (
-        <p>
-          Thank you for your participation in the experiment! You may close this
-          tab now.
-        </p>
+        <Outro />
       )}
     </>
   );

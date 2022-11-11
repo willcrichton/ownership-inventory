@@ -17,6 +17,7 @@ importers:
   packages/ownership-inventory:
     specifiers:
       '@surma/rollup-plugin-off-main-thread': ^2.2.3
+      '@tippyjs/react': ^4.2.6
       '@types/file-saver': ^2.0.5
       '@types/intro.js': ^5.1.0
       '@types/lodash': ^4.14.184
@@ -36,12 +37,14 @@ importers:
       react: ^18.2.0
       react-dom: ^18.2.0
       react-markdown: ^8.0.3
+      tippy.js: ^6.3.7
       uuid: ^9.0.0
     dependencies:
       react: 18.2.0
       react-dom: 18.2.0_react@18.2.0
     devDependencies:
       '@surma/rollup-plugin-off-main-thread': 2.2.3
+      '@tippyjs/react': 4.2.6_biqbaboplfbrettd7655fr4n2y
       '@types/file-saver': 2.0.5
       '@types/intro.js': 5.1.0
       '@types/lodash': 4.14.188
@@ -59,6 +62,7 @@ importers:
       mobx-react: 7.5.3_qrr2ojv4n7h7ey2xj7njerqqr4
       normalize.css: 8.0.1
       react-markdown: 8.0.3_fan5qbzahqtxlm5dzefqlqx5ia
+      tippy.js: 6.3.7
       uuid: 9.0.0
 
   packages/rust-editor:
@@ -133,6 +137,10 @@ packages:
     resolution: {integrity: sha512-trnsAYxU3xnS1gPHPyU961coFyLkh4gAD/0zQ5mymY4yOZ+CYvsPqUbOFSw0aDM4y0tV7tiFxL/1XfXPNC6IPg==}
     dev: true
 
+  /@popperjs/core/2.11.6:
+    resolution: {integrity: sha512-50/17A98tWUfQ176raKiOGXuYpLyyVMkxxG6oylzL3BPOlA6ADGdK7EYunSa4I064xerltq9TGXs8HmOk5E+vw==}
+    dev: true
+
   /@surma/rollup-plugin-off-main-thread/2.2.3:
     resolution: {integrity: sha512-lR8q/9W7hZpMWweNiAKU7NQerBnzQQLvi8qnTDU/fxItPhtZVMbPV3lbCwjhIlNBe9Bbr5V+KHshvWmVSG9cxQ==}
     dependencies:
@@ -140,6 +148,17 @@ packages:
       json5: 2.2.1
       magic-string: 0.25.9
       string.prototype.matchall: 4.0.8
+    dev: true
+
+  /@tippyjs/react/4.2.6_biqbaboplfbrettd7655fr4n2y:
+    resolution: {integrity: sha512-91RicDR+H7oDSyPycI13q3b7o4O60wa2oRbjlz2fyRLmHImc4vyDwuUP8NtZaN0VARJY5hybvDYrFzhY9+Lbyw==}
+    peerDependencies:
+      react: '>=16.8'
+      react-dom: '>=16.8'
+    dependencies:
+      react: 18.2.0
+      react-dom: 18.2.0_react@18.2.0
+      tippy.js: 6.3.7
     dev: true
 
   /@types/debug/4.1.7:
@@ -1399,6 +1418,12 @@ packages:
   /supports-preserve-symlinks-flag/1.0.0:
     resolution: {integrity: sha512-ot0WnXS9fgdkgIcePe6RHNk1WA8+muPa6cSjeR3V8K27q9BB1rTE3R1p7Hv0z1ZyAc8s6Vvv8DIyWf681MAt0w==}
     engines: {node: '>= 0.4'}
+    dev: true
+
+  /tippy.js/6.3.7:
+    resolution: {integrity: sha512-E1d3oP2emgJ9dRQZdf3Kkn0qJgI6ZLpyS5z6ZkY1DF3kaQaBsGZsndEpHwx+eC+tYM41HaSNvNtLx8tU57FzTQ==}
+    dependencies:
+      '@popperjs/core': 2.11.6
     dev: true
 
   /trim-lines/3.0.1:
