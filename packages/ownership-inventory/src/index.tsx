@@ -9,10 +9,10 @@ import { Intro } from "./intro";
 import { Problem } from "./problem";
 import { Tutorial } from "./tutorial";
 
-let PROBLEMS = [
+const PROBLEMS = [
   `
-// Makes a string to separate lines of text, 
-// returning a default if the provided string is blank
+/// Makes a string to separate lines of text, 
+/// returning a default if the provided string is blank
 fn make_separator(user_str: &str) -> &str {
   if user_str == "" {
     let default = "=".repeat(10);
@@ -23,8 +23,8 @@ fn make_separator(user_str: &str) -> &str {
 }
   `,
   `
-// Gets the string out of an option if it exists,
-// returning a default otherwise
+/// Gets the string out of an option if it exists,
+/// returning a default otherwise
 fn get_or_default(arg: &Option<String>) -> String {
   if arg.is_none() {
       return String::new();
@@ -34,7 +34,15 @@ fn get_or_default(arg: &Option<String>) -> String {
 }
     `,
   `
-// Removes all the zeros in-place from a vector of integers.
+/// Returns the n-th largest element in a slice
+fn find_nth<T: Ord + Clone>(elems: &[T], n: usize) -> T {
+  elems.sort();
+  let t = &elems[n];
+  return t.clone();
+}
+  `,
+  `
+/// Removes all the zeros in-place from a vector of integers.
 fn remove_zeros(v: &mut Vec<i32>) {
   for (i, t) in v.iter().enumerate().rev() {
     if *t == 0 {
@@ -43,6 +51,59 @@ fn remove_zeros(v: &mut Vec<i32>) {
   }
 }
   `,
+  `
+struct TestResult {
+  /// Student's scores on a test
+  scores: Vec<usize>,
+
+  /// A possible value to curve all sores
+  curve: Option<usize>
+}
+impl TestResult {  
+  pub fn get_curve(&self) -> &Option<usize> { 
+    &self.curve 
+  }
+
+  /// If there is a curve, then increments all 
+  /// scores by the curve
+  pub fn apply_curve(&mut self) {
+    if let Some(curve) = self.get_curve() {
+      for score in self.scores.iter_mut() {
+        *score += *curve;
+      }
+    }
+  }
+}
+`,
+  `
+/// Reverses the elements of a vector in-place
+fn reverse(v: &mut Vec<i32>) {
+  let n = v.len();
+  for i in 0 .. n / 2 {
+    std::mem::swap(&mut v[i], &mut v[n - i - 1]);
+  }
+}
+`,
+  `
+/// Adds the string \`s\` to all elements of 
+/// the input iterator
+fn concat_all(
+  iter: impl Iterator<Item = String>,
+  s: &str
+) -> impl Iterator<Item = String> {
+  iter.map(move |s2| s2 + s)
+}
+`,
+  `
+/// Adds a Display-able object into a vector of 
+/// Display trait objects
+use std::fmt::Display;
+fn add_displayable<T: Display>(
+  v: &mut Vec<Box<dyn Display>>, 
+  t: T
+) {
+  v.push(Box::new(t));
+}`,
 ];
 
 let Outro = () => {
@@ -84,9 +145,10 @@ let Outro = () => {
 };
 
 let App = () => {
+  let problems = useMemo(() => _.sampleSize(PROBLEMS, 3), []);
   let id = useMemo(() => uuid.v4(), []);
   let [stage, setStage] = useState<"start" | "tutorial" | "problems" | "end">(
-    "start"
+    "problems"
   );
   let [problem, setProblem] = useState(0);
   let [answers] = useState<any[]>([]);
@@ -135,7 +197,7 @@ let App = () => {
             <>&mdash; Tutorial</>
           ) : stage == "problems" ? (
             <>
-              &mdash; Task {problem + 1} / {PROBLEMS.length}
+              &mdash; Task {problem + 1} / {problems.length}
             </>
           ) : null}
         </h1>
@@ -152,14 +214,14 @@ let App = () => {
       ) : stage == "problems" ? (
         <Problem
           key={problem}
-          snippet={PROBLEMS[problem].trim()}
+          snippet={problems[problem].trim()}
           ra={ra}
           next={answer => {
             answers.push({
-              question: PROBLEMS[problem],
+              question: problems[problem],
               answer,
             });
-            problem + 1 < PROBLEMS.length
+            problem + 1 < problems.length
               ? setProblem(problem + 1)
               : setStage("end");
           }}

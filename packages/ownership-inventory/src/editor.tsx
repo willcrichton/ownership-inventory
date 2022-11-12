@@ -38,6 +38,12 @@ export let scrollToBottom = () =>
     behavior: "smooth",
   });
 
+export let EditorBlock: typeof Editor = props => (
+  <div className="editor-wrapper">
+    <Editor {...props} />
+  </div>
+);
+
 export let RunnableEditor = ({
   ra,
   initialContents,
@@ -63,7 +69,7 @@ export let RunnableEditor = ({
   };
   return (
     <div className="runnable-editor">
-      <Editor
+      <EditorBlock
         contents={state.contents}
         onChange={(c: any) => {
           state.contents = c;

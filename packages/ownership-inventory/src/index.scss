@@ -31,7 +31,7 @@ input[type=email] {
   > div {
     box-sizing: border-box;
     padding: 1em;
-    border: 1px solid #ccc;
+    border: 1px solid #999;
     width: calc(50% - $gap);
   }
 
@@ -44,9 +44,12 @@ input[type=email] {
     margin: 0;
   }
 
-  .editor {
+  .editor-wrapper {
     margin-block-start: 1em;
     margin-block-end: 1em;
+    box-sizing: border-box;
+    padding: 4px;
+    border: 1px solid #ccc; 
   }
 
   .runnable-editor .output {
