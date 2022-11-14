@@ -21,6 +21,7 @@
     "@types/react": "^18.0.17",
     "@types/react-dom": "^18.0.6",
     "@types/streamsaver": "^2.0.1",
+    "@types/ua-parser-js": "^0.7.36",
     "@types/uuid": "^8.3.4",
     "@wcrichto/rust-editor": "^0.0.1",
     "coi-serviceworker": "^0.1.6",
@@ -33,6 +34,7 @@
     "react-markdown": "^8.0.3",
     "rollup-plugin-toml": "^1.0.0",
     "tippy.js": "^6.3.7",
+    "ua-parser-js": "^1.0.32",
     "uuid": "^9.0.0"
   }
 }

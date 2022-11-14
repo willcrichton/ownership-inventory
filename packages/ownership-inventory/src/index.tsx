@@ -10,8 +10,6 @@ import { Problem } from "./problem";
 import { problems as PROBLEMS } from "./problems.toml";
 import { Tutorial } from "./tutorial";
 
-console.log(PROBLEMS);
-
 let Outro = () => {
   let textarea = useRef<HTMLTextAreaElement>(null);
   let [submitted, setSubmitted] = useState(false);
