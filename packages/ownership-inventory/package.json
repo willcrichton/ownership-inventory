@@ -31,6 +31,7 @@
     "mobx-react": "^7.5.3",
     "normalize.css": "^8.0.1",
     "react-markdown": "^8.0.3",
+    "rollup-plugin-toml": "^1.0.0",
     "tippy.js": "^6.3.7",
     "uuid": "^9.0.0"
   }

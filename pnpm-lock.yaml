@@ -37,6 +37,7 @@ importers:
       react: ^18.2.0
       react-dom: ^18.2.0
       react-markdown: ^8.0.3
+      rollup-plugin-toml: ^1.0.0
       tippy.js: ^6.3.7
       uuid: ^9.0.0
     dependencies:
@@ -62,6 +63,7 @@ importers:
       mobx-react: 7.5.3_qrr2ojv4n7h7ey2xj7njerqqr4
       normalize.css: 8.0.1
       react-markdown: 8.0.3_fan5qbzahqtxlm5dzefqlqx5ia
+      rollup-plugin-toml: 1.0.0
       tippy.js: 6.3.7
       uuid: 9.0.0
 
@@ -619,6 +621,10 @@ packages:
       esbuild-windows-32: 0.15.13
       esbuild-windows-64: 0.15.13
       esbuild-windows-arm64: 0.15.13
+    dev: true
+
+  /estree-walker/0.6.1:
+    resolution: {integrity: sha512-SqmZANLWS0mnatqbSfRP5g8OXZC12Fgg1IwNtLsyHDzJizORW4khDfjPqJZsemPWBB2uqykUah5YpQ6epsqC/w==}
     dev: true
 
   /extend/3.0.2:
@@ -1324,6 +1330,19 @@ packages:
       supports-preserve-symlinks-flag: 1.0.0
     dev: true
 
+  /rollup-plugin-toml/1.0.0:
+    resolution: {integrity: sha512-+qpNOm3c5RqwcYeD9BxYtC7fj9nLbU4zHU2yYYvQEG9jXMKuOQVO3vpBDvwaI7H5HzEwmWD7NOER7CTnXiQGFw==}
+    dependencies:
+      rollup-pluginutils: 2.8.2
+      toml: 2.3.6
+    dev: true
+
+  /rollup-pluginutils/2.8.2:
+    resolution: {integrity: sha512-EEp9NhnUkwY8aif6bxgovPHMoMoNr2FulJziTndpt5H9RdwC47GSGuII9XxpSdzVGM0GWrNPHV6ie1LTNJPaLQ==}
+    dependencies:
+      estree-walker: 0.6.1
+    dev: true
+
   /rollup/2.79.1:
     resolution: {integrity: sha512-uKxbd0IhMZOhjAiD5oAFp7BqvkA4Dv47qpOCtaNvng4HBwdbWtdOh8f5nZNuk2rp51PMGk3bzfWu5oayNEuYnw==}
     engines: {node: '>=10.0.0'}
@@ -1424,6 +1443,10 @@ packages:
     resolution: {integrity: sha512-E1d3oP2emgJ9dRQZdf3Kkn0qJgI6ZLpyS5z6ZkY1DF3kaQaBsGZsndEpHwx+eC+tYM41HaSNvNtLx8tU57FzTQ==}
     dependencies:
       '@popperjs/core': 2.11.6
+    dev: true
+
+  /toml/2.3.6:
+    resolution: {integrity: sha512-gVweAectJU3ebq//Ferr2JUY4WKSDe5N+z0FvjDncLGyHmIDoxgY/2Ie4qfEIDm4IS7OA6Rmdm7pdEEdMcV/xQ==}
     dev: true
 
   /trim-lines/3.0.1:

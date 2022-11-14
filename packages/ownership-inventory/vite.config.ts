@@ -3,6 +3,7 @@ import react from "@vitejs/plugin-react";
 import esbuild from "esbuild";
 import fs from "fs";
 import path from "path";
+import toml from "rollup-plugin-toml";
 import { defineConfig } from "vite";
 
 export default defineConfig({
@@ -10,6 +11,7 @@ export default defineConfig({
   plugins: [
     OMT(),
     react(),
+    toml,
     {
       name: "StaticFiles",
       async closeBundle() {
