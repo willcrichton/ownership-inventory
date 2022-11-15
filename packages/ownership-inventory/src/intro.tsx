@@ -11,12 +11,11 @@ We will use these results to inform the design of our
 [Rust Book Experiment](https://rust-book.cs.brown.edu/).
 
 **Compensation:** you will be compensated with a $20 Amazon gift card for completing
-this experiment in good faith.
+this experiment. We will send you compensation after verifying you attempted the experiment 
+in good faith (e.g. did not leave everything blank).
 
-**Prerequisites:** 
-* You MUST have read [The Rust Programming Language](https://doc.rust-lang.org/book/),
+**Prerequisites:** you MUST have read [The Rust Programming Language](https://doc.rust-lang.org/book/),
 OR have equivalent knowledge of Rust from other sources. You do NOT need to be a Rust expert.
-* You MUST participate from a computer with a keyboard (not a phone).
 `;
 
 export let Intro = ({ next }: { next: (email: string) => void }) => {
@@ -30,7 +29,7 @@ export let Intro = ({ next }: { next: (email: string) => void }) => {
   let isBrave = "brave" in navigator;
   if (!allowedBrowsers.includes(userAgent.browser.name || "") || isBrave) {
     return (
-      <div className="container">
+      <div className="container intro">
         <p>
           Sorry, you cannot participate in this experiment from this browser.
           This experiment uses advanced web features to run{" "}
