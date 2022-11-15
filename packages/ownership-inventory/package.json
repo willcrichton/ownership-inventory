@@ -26,6 +26,7 @@
     "@wcrichto/rust-editor": "^0.0.1",
     "coi-serviceworker": "^0.1.6",
     "file-saver": "^2.0.5",
+    "framer-motion": "^7.6.6",
     "intro.js": "^6.0.0",
     "lodash": "^4.17.21",
     "mobx": "^6.6.2",

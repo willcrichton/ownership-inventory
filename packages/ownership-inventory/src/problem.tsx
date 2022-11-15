@@ -1,7 +1,8 @@
 import Tippy from "@tippyjs/react";
 import { RustAnalyzer } from "@wcrichto/rust-editor";
+import { motion, useAnimation } from "framer-motion";
 import _ from "lodash";
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useMemo, useState } from "react";
 import "tippy.js/dist/tippy.css";
 
 import {
@@ -10,6 +11,8 @@ import {
   evalRust,
   scrollToBottom,
 } from "./editor";
+
+export type Timed<T> = T & { start: number; end: number };
 
 export interface Answer {
   errorExplanation: string;
@@ -27,6 +30,58 @@ let MoreInfo: React.FC<React.PropsWithChildren> = ({ children }) => (
   </Tippy>
 );
 
+const RECOMMENDED_TIME = 15 * 60 * 1000;
+const BEFORE_WARNING = 5 * 60 * 1000;
+
+export let OverrideTimer = React.createContext(false);
+
+let Timer = ({ start }: { start: number }) => {
+  let overrideTimer = useContext(OverrideTimer);
+
+  let elapsed = new Date().getTime() - start;
+  let beforeWarning =
+    elapsed > RECOMMENDED_TIME - BEFORE_WARNING || overrideTimer;
+  let overTime = elapsed > RECOMMENDED_TIME;
+  let remainingMinutes = Math.ceil((RECOMMENDED_TIME - elapsed) / (60 * 1000));
+
+  let controls = useAnimation();
+  useEffect(() => {
+    controls.set({
+      backgroundColor: "#ffdc00",
+    });
+    controls.start({
+      backgroundColor: "#fff",
+      transition: { duration: 2 },
+    });
+  }, [overTime]);
+
+  let [_n, render] = useState(0);
+  useEffect(() => {
+    let n = 0;
+    let intvl = setInterval(() => render(n++), 1000);
+    return () => clearInterval(intvl);
+  }, []);
+
+  return overTime || beforeWarning ? (
+    <motion.div
+      className={"timer " + (overTime ? "finished" : "warning")}
+      animate={controls}
+    >
+      {overTime ? (
+        <>
+          The time allotted has elapsed. You should continue to the next task.
+        </>
+      ) : (
+        <>
+          You should aim to finish this task within{" "}
+          <span className="time">{remainingMinutes}</span> minute
+          {remainingMinutes > 1 ? "s" : null}.
+        </>
+      )}
+    </motion.div>
+  ) : null;
+};
+
 export let Problem = ({
   snippet,
   next,
@@ -35,12 +90,13 @@ export let Problem = ({
 }: {
   snippet: string;
   ra?: RustAnalyzer;
-  next: (a: Answer) => void;
+  next: (a: Timed<Answer>) => void;
   onStep?: (step: number) => void;
 }) => {
+  let start = useMemo(() => new Date().getTime(), [snippet]);
   let [step, setStep] = useState(0);
 
-  let [errorMessage, setErrorMessage] = useState<string | undefined>(undefined);
+  let [errorMessage, setErrorMessage] = useState<string | undefined>();
   useEffect(() => {
     evalRust(snippet).then(result => setErrorMessage(result.stderr));
   });
@@ -171,24 +227,28 @@ export let Problem = ({
 
   return (
     <div className="problem">
-      {parts
-        .filter((_p, i) => i <= step)
-        .map((part, i) => (
-          <div className="part" key={i}>
-            <h2>Part {i + 1}</h2>
-            <div>{part(step != i)}</div>
-            <button
-              disabled={step != i}
-              onClick={() => {
-                onStep && onStep(step + 1);
-                if (step == 3) next(answer);
-                else setStep(step + 1);
-              }}
-            >
-              Submit
-            </button>
-          </div>
-        ))}
+      <Timer start={start} />
+      <div className="parts">
+        {parts
+          .filter((_p, i) => i <= step)
+          .map((part, i) => (
+            <div className="part" key={i}>
+              <h2>Part {i + 1}</h2>
+              <div>{part(step != i)}</div>
+              <button
+                disabled={step != i}
+                onClick={() => {
+                  onStep && onStep(step + 1);
+                  if (step == 3)
+                    next({ ...answer, start, end: new Date().getTime() });
+                  else setStep(step + 1);
+                }}
+              >
+                Submit
+              </button>
+            </div>
+          ))}
+      </div>
     </div>
   );
 };

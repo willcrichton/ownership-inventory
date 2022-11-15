@@ -2,7 +2,7 @@ import { RustAnalyzer } from "@wcrichto/rust-editor";
 import introJs from "intro.js";
 import React, { useEffect, useRef, useState } from "react";
 
-import { Problem } from "./problem";
+import { OverrideTimer, Problem } from "./problem";
 
 const SNIPPET = `
 /// Inserts the element 0 into the end of \`v\`.
@@ -22,6 +22,7 @@ export let Tutorial = ({
   let [started, setStarted] = useState(false);
   let [step, setStep] = useState(0);
   let [curTour, setCurTour] = useState<introJs.IntroJs | undefined>();
+  let [showTimer, setShowTimer] = useState(false);
 
   let makeTour = (steps: introJs.Step[]) => {
     if (curTour) curTour.exit();
@@ -104,6 +105,7 @@ export let Tutorial = ({
       makeTour(steps);
     } else if (step == 3) {
       let outputArea = part.querySelector(".output button")!;
+      let timer = parent.querySelector(".timer")!;
       let steps: introJs.Step[] = [
         {
           element: part,
@@ -118,9 +120,15 @@ export let Tutorial = ({
           position: "left",
         },
         {
+          element: timer,
+          intro:
+            "<p>Each task should take no more than 15 minutes. During the experiment, this notification will appear when you have 5 minutes left.</p><p>The experiment will not force you to the next task if you want to finish your response. This notification provides a guideline so you don't spend too much time on the experiment.</p>",
+          position: "bottom",
+        },
+        {
           element: part,
           intro:
-            "And that's all the tasks! Try fixing this function. Once you hit submit, we will go to the main experiment.",
+            "That's all for the tutorial! Try fixing this function. Once you hit submit, we will go to the main experiment.",
           position: "left",
         },
       ];
@@ -129,24 +137,27 @@ export let Tutorial = ({
   }, [started, step]);
 
   return (
-    <div ref={ref}>
-      <p>
-        First, we're going to walk through a sample problem. Click this button
-        to get started:
-        <br />
-        <button onClick={() => setStarted(true)}>Start Tutorial</button>
-      </p>
-      {started ? (
-        <Problem
-          snippet={SNIPPET}
-          next={next}
-          ra={ra}
-          onStep={step => {
-            if (step == 4) curTour!.exit();
-            setStep(step);
-          }}
-        />
-      ) : null}
-    </div>
+    <OverrideTimer.Provider value={showTimer}>
+      <div ref={ref}>
+        <p>
+          First, we're going to walk through a sample problem. Click this button
+          to get started:
+          <br />
+          <button onClick={() => setStarted(true)}>Start Tutorial</button>
+        </p>
+        {started ? (
+          <Problem
+            snippet={SNIPPET}
+            next={next}
+            ra={ra}
+            onStep={step => {
+              if (step == 3) setShowTimer(true);
+              if (step == 4) curTour!.exit();
+              setStep(step);
+            }}
+          />
+        ) : null}
+      </div>
+    </OverrideTimer.Provider>
   );
 };

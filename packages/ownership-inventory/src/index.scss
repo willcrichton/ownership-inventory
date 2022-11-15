@@ -23,12 +23,33 @@ input[type=email] {
 }
 
 .problem {
-  display: flex;
   $gap: 1em;
-  gap: $gap;
-  flex-wrap: wrap;
+  position: relative;
 
-  > div {
+  .timer {
+    position: absolute;
+    right: 10px;
+    top: -2.5em;
+    border: 1px solid #ccc;
+    padding: 0.5em;
+
+    &.finished {
+      color: red;
+    }
+
+    .time {
+      color: red;
+    }
+  }
+
+  .parts {
+    display: flex;
+    $gap: 1em;
+    gap: $gap;
+    flex-wrap: wrap;
+  }
+
+  .part {
     box-sizing: border-box;
     padding: 1em;
     border: 1px solid #999;

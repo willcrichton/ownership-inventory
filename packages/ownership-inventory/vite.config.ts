@@ -14,12 +14,13 @@ export default defineConfig({
     toml,
     {
       name: "StaticFiles",
-      async closeBundle() {
+      async writeBundle(options, bundle) {
+        let outDir = options.dir!;
         [
           "node_modules/coi-serviceworker/coi-serviceworker.js",
           "node_modules/@wcrichto/rust-editor/dist/editor.worker.js",
         ].forEach(f => {
-          fs.copyFileSync(f, path.join("dist", path.basename(f)));
+          fs.copyFileSync(f, path.join(outDir, path.basename(f)));
         });
 
         /*
@@ -29,19 +30,16 @@ export default defineConfig({
         like Firefox don't support ESM web workers. A hack that seems to work is just
         replacing all `import.meta.url` references with `self.location`.
 
-        Note that has to happen in `closeBundle` and not `transform`, since if we
+        Note that has to happen in `writeBundle` and not `transform`, since if we
         make this change too soon, then Vite misses the URLs and doesn't copy the
         assets.
         */
-        let assets = fs.readdirSync("dist/assets");
-        ["ra-worker", "workerHelpers"].forEach(prefix => {
-          let p = path.join(
-            "dist/assets",
-            assets.find(p => p.startsWith(prefix))!
-          );
-          let contents = fs.readFileSync(p, "utf-8");
+        ["ra-worker", "workerHelpers"].forEach(name => {
+          let asset = Object.values(bundle).find(asset => asset.name == name)!;
+          let assetPath = path.join(outDir, asset.fileName);
+          let contents = fs.readFileSync(assetPath, "utf-8");
           contents = contents.replace(/import\.meta\.url/g, `self.location`);
-          fs.writeFileSync(p, contents);
+          fs.writeFileSync(assetPath, contents);
         });
       },
     },

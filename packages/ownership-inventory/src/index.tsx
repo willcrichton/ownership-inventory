@@ -6,7 +6,7 @@ import * as uuid from "uuid";
 
 import "./index.scss";
 import { Intro } from "./intro";
-import { Problem } from "./problem";
+import { Answer, Problem, Timed } from "./problem";
 import { problems as PROBLEMS } from "./problems.toml";
 import { Tutorial } from "./tutorial";
 
@@ -48,18 +48,30 @@ let Outro = () => {
   );
 };
 
+interface TaggedAnswer {
+  question: string;
+  answer: Timed<Answer>;
+}
+
+interface ExperimentData {
+  id: string;
+  email: string;
+  answers: TaggedAnswer[];
+}
+
 let App = () => {
   let problems = useMemo(() => _.sampleSize(PROBLEMS, 3), []);
   let id = useMemo(() => uuid.v4(), []);
   let start = useMemo(() => new Date().getTime(), []);
+  let answers = useMemo<TaggedAnswer[]>(() => [], []);
+
   let [stage, setStage] = useState<"start" | "tutorial" | "problems" | "end">(
     "start"
   );
   let [problem, setProblem] = useState(0);
-  let [answers] = useState<any[]>([]);
   let [email, setEmail] = useState<string | undefined>();
 
-  let [ra, setRa] = useState<RustAnalyzer | undefined>(undefined);
+  let [ra, setRa] = useState<RustAnalyzer | undefined>();
   useEffect(() => {
     RustAnalyzer.load().then(setRa);
   }, []);
@@ -76,10 +88,10 @@ let App = () => {
 
   useEffect(() => {
     if (answers.length > 0) {
-      let payload = {
+      let payload: Timed<ExperimentData> = {
         id,
         answers,
-        email,
+        email: email!,
         start,
         end: new Date().getTime(),
       };
