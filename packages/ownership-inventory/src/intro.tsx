@@ -65,7 +65,9 @@ export let Prerequisites = ({ next }: { next: () => void }) => {
 export interface Demographics {
   name: string;
   email: string;
-  yearsRust: string;
+  yearsRust: number;
+  yearsC: number;
+  yearsCpp: number;
 }
 
 export let Intro = ({ next }: { next: (demo: Demographics) => void }) => {
@@ -201,7 +203,7 @@ export let Intro = ({ next }: { next: (demo: Demographics) => void }) => {
           </table>
         </FadeIn>
       ) : null}
-      {demo.yearsRust ? (
+      {demo.yearsRust && demo.yearsC && demo.yearsCpp ? (
         <FadeIn>
           <p>
             <button onClick={() => next(demo as Demographics)}>

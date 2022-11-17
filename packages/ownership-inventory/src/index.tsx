@@ -60,7 +60,12 @@ interface ExperimentData {
 }
 
 let App = () => {
-  let problems = useMemo(() => _.sampleSize(PROBLEMS, 3), []);
+  // let problems = useMemo(() => _.sampleSize(PROBLEMS, 3), []);
+  let problems = _.shuffle([
+    "make_separator",
+    "get_or_default",
+    "remove_zeros",
+  ]).map(name => _.find(PROBLEMS, { name })!);
   let id = useMemo(() => uuid.v4(), []);
   let start = useMemo(() => new Date().getTime(), []);
   let answers = useMemo<TaggedAnswer[]>(() => [], []);
