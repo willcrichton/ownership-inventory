@@ -5,12 +5,18 @@ import ReactDOM from "react-dom/client";
 import * as uuid from "uuid";
 
 import "./index.scss";
-import { Demographics, Intro } from "./intro";
+import { Demographics, FadeIn, Intro } from "./intro";
 import { Answer, Problem, Timed } from "./problem";
 import { problems as PROBLEMS } from "./problems.toml";
 import { Tutorial } from "./tutorial";
 
-let Outro = () => {
+let Outro = ({
+  data,
+  saved,
+}: {
+  data: Timed<ExperimentData>;
+  saved: "unsaved" | "saved" | "error";
+}) => {
   let textarea = useRef<HTMLTextAreaElement>(null);
   let [submitted, setSubmitted] = useState(false);
   let submit = () => {
@@ -24,26 +30,62 @@ let Outro = () => {
     });
     setSubmitted(true);
   };
+
+  let DownloadBackup = () => {
+    let url = useMemo(() => {
+      let blob = new Blob([JSON.stringify(data)], { type: "text/json" });
+      return URL.createObjectURL(blob);
+    }, []);
+    return (
+      <FadeIn>
+        <p>
+          <strong>ERROR:</strong> The data upload to our server failed. As a
+          backup, please download this JSON file:
+        </p>
+        <p>
+          <a href={url} download="experiment-data.json">
+            Download JSON
+          </a>
+        </p>
+        <p>
+          Then attach it in an email to{" "}
+          <a href="mailto:wcrichto@brown.edu">wcrichto@brown.edu</a>
+        </p>
+      </FadeIn>
+    );
+  };
+
   return (
     <div className="outro">
-      <p>
-        Thank you for your participation in the experiment! If you have any
-        feedback on the format of the experiment, please let us know:
-      </p>
-      <textarea
-        ref={textarea}
-        placeholder="Put your feedback here..."
-        disabled={submitted}
-      />
-      <p>
-        <button onClick={submit} disabled={submitted}>
-          Submit Feedback
-        </button>
-        {submitted ? " Feedback received. Thanks!" : null}
-      </p>
-      <p>
-        Otherwise, the experiment has concluded. You may close this tab now.
-      </p>
+      {saved == "unsaved" ? (
+        <p>
+          <strong>DO NOT CLOSE THIS TAB.</strong> We are uploading the
+          experimental data to our server, please wait...
+        </p>
+      ) : saved == "saved" ? (
+        <FadeIn>
+          <p>
+            Thank you for your participation in the experiment! If you have any
+            feedback on the format of the experiment, please let us know:
+          </p>
+          <textarea
+            ref={textarea}
+            placeholder="Put your feedback here..."
+            disabled={submitted}
+          />
+          <p>
+            <button onClick={submit} disabled={submitted}>
+              Submit Feedback
+            </button>
+            {submitted ? " Feedback received. Thanks!" : null}
+          </p>
+          <p>
+            Otherwise, the experiment has concluded. You may close this tab now.
+          </p>
+        </FadeIn>
+      ) : (
+        <DownloadBackup />
+      )}
     </div>
   );
 };
@@ -75,6 +117,7 @@ let App = () => {
   );
   let [problem, setProblem] = useState(0);
   let [demo, setDemo] = useState<Demographics | undefined>();
+  let [saved, setSaved] = useState<"unsaved" | "saved" | "error">("unsaved");
 
   let [ra, setRa] = useState<RustAnalyzer | undefined>();
   useEffect(() => {
@@ -91,25 +134,38 @@ let App = () => {
     }
   }, [stage]);
 
-  useEffect(() => {
+  let compileData = (): Timed<ExperimentData> => ({
+    id,
+    answers,
+    demo: demo!,
+    start,
+    end: new Date().getTime(),
+  });
+
+  let onSubmitProblem = (answer: Timed<Answer>) => {
+    answers.push({
+      question: problems[problem].name,
+      answer,
+    });
+
     if (answers.length > 0) {
-      let payload: Timed<ExperimentData> = {
-        id,
-        answers,
-        demo: demo!,
-        start,
-        end: new Date().getTime(),
-      };
-      fetch("https://mindover.computer/ownership-inventory", {
+      let promise = fetch("https://mindover.computer/ownership-inventory", {
         headers: {
           "Content-Type": "application/json",
         },
         method: "POST",
         mode: "cors",
-        body: JSON.stringify(payload),
+        body: JSON.stringify(compileData()),
       });
+
+      if (answers.length == problems.length) {
+        promise.then(() => setSaved("saved")).catch(() => setSaved("error"));
+      }
     }
-  });
+
+    if (problem + 1 < problems.length) setProblem(problem + 1);
+    else setStage("end");
+  };
 
   return (
     <>
@@ -139,18 +195,10 @@ let App = () => {
           key={problem}
           snippet={problems[problem].code.trim()}
           ra={ra}
-          next={answer => {
-            answers.push({
-              question: problems[problem].name,
-              answer,
-            });
-            problem + 1 < problems.length
-              ? setProblem(problem + 1)
-              : setStage("end");
-          }}
+          next={onSubmitProblem}
         />
       ) : (
-        <Outro />
+        <Outro data={compileData()} saved={saved} />
       )}
     </>
   );

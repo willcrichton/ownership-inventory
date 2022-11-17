@@ -4,7 +4,7 @@ import React, { useRef, useState } from "react";
 import ReactMarkdown from "react-markdown";
 import UAParser from "ua-parser-js";
 
-let FadeIn: React.FC<React.PropsWithChildren> = ({ children }) => (
+export let FadeIn: React.FC<React.PropsWithChildren> = ({ children }) => (
   <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
     {children}
   </motion.div>
