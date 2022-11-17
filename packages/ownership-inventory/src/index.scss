@@ -22,6 +22,19 @@ input[type=email] {
   width: 250px; 
 }
 
+.prerequisites {
+  list-style-type: none;
+
+  li {
+    margin-block-end: 1em;
+  }
+
+  input[type=checkbox] {
+    margin-left: -28px;
+    margin-right: 13px;
+  }
+}
+
 .problem {
   $gap: 1em;
   position: relative;
@@ -38,7 +51,15 @@ input[type=email] {
     }
 
     .time {
-      color: red;
+      color: #06a800;
+
+      &.warning {
+        color: #b0a100;
+      }
+
+      &.finished {
+        color: red;
+      }
     }
   }
 
@@ -114,34 +135,10 @@ pre {
   }
 }
 
-
-.info-wrapper {
-  display: inline-block;
-  position: relative;
-}
-.info {
-  display: inline-block;
-  color: #999;
-  border: 1px solid #999;
-  border-radius: 50%;
-  vertical-align: middle;
-  font-size: 12px;
-  width: 17px;
-  height: 17px;
-  font-weight: bold;
-  line-height: 15px;
-  text-align: center;
-  cursor: pointer;
-
-  &:hover {
-    color: #333;
-    border-color: #333;
-  }
-
-  &::before {
-    content: "i";
-    font-family: Inconsolata, monospace;
-    vertical-align: middle;
+.more-info {
+  .link {
+    color: #0082a3;
+    cursor: pointer;
   }
 }
 

@@ -1,9 +1,7 @@
-import Tippy from "@tippyjs/react";
 import { RustAnalyzer } from "@wcrichto/rust-editor";
 import { motion, useAnimation } from "framer-motion";
 import _ from "lodash";
-import React, { useContext, useEffect, useMemo, useState } from "react";
-import "tippy.js/dist/tippy.css";
+import React, { useEffect, useMemo, useState } from "react";
 
 import {
   EditorBlock,
@@ -21,31 +19,37 @@ export interface Answer {
   functionFix: string;
 }
 
-let MoreInfo: React.FC<React.PropsWithChildren> = ({ children }) => (
-  // z-index has to be larger than Monaco and Intro.js
-  <Tippy content={children} trigger={"click"} zIndex={100000001}>
-    <span className="info-wrapper">
-      <span className="info" />
+let MoreInfo: React.FC<React.PropsWithChildren> = ({ children }) => {
+  let [open, setOpen] = useState(false);
+  return (
+    <span className="more-info">
+      <span className="link" onClick={() => setOpen(!open)}>
+        {open ? "Less context «" : "More context »"}
+      </span>
+      {open ? (
+        <>
+          <br />
+          <br />
+          {children}
+        </>
+      ) : null}
     </span>
-  </Tippy>
-);
+  );
+};
 
 const RECOMMENDED_TIME = 15 * 60 * 1000;
 const BEFORE_WARNING = 5 * 60 * 1000;
 
-export let OverrideTimer = React.createContext(false);
-
 let Timer = ({ start }: { start: number }) => {
-  let overrideTimer = useContext(OverrideTimer);
-
   let elapsed = new Date().getTime() - start;
-  let beforeWarning =
-    elapsed > RECOMMENDED_TIME - BEFORE_WARNING || overrideTimer;
+  let beforeWarning = elapsed > RECOMMENDED_TIME - BEFORE_WARNING;
   let overTime = elapsed > RECOMMENDED_TIME;
-  let remainingMinutes = Math.ceil((RECOMMENDED_TIME - elapsed) / (60 * 1000));
+  let spentMinutes = Math.floor(elapsed / (60 * 1000));
 
   let controls = useAnimation();
   useEffect(() => {
+    if (!(beforeWarning || overTime)) return;
+
     controls.set({
       backgroundColor: "#ffdc00",
     });
@@ -53,7 +57,7 @@ let Timer = ({ start }: { start: number }) => {
       backgroundColor: "#fff",
       transition: { duration: 2 },
     });
-  }, [overTime]);
+  }, [beforeWarning, overTime]);
 
   let [_n, render] = useState(0);
   useEffect(() => {
@@ -62,24 +66,15 @@ let Timer = ({ start }: { start: number }) => {
     return () => clearInterval(intvl);
   }, []);
 
-  return overTime || beforeWarning ? (
-    <motion.div
-      className={"timer " + (overTime ? "finished" : "warning")}
-      animate={controls}
-    >
-      {overTime ? (
-        <>
-          The time allotted has elapsed. You should continue to the next task.
-        </>
-      ) : (
-        <>
-          You should aim to finish this task within{" "}
-          <span className="time">{remainingMinutes}</span> minute
-          {remainingMinutes > 1 ? "s" : null}.
-        </>
-      )}
+  let extraClass = overTime ? "finished" : beforeWarning ? "warning" : "";
+
+  return (
+    <motion.div className={"timer " + extraClass} animate={controls}>
+      You have spent{" "}
+      <span className={"time " + extraClass}>{spentMinutes}</span> minutes on
+      this task. {overTime ? <>You should continue to the next task.</> : null}
     </motion.div>
-  ) : null;
+  );
 };
 
 export let Problem = ({

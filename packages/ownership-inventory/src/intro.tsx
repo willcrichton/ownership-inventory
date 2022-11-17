@@ -1,6 +1,14 @@
-import React, { useState } from "react";
+import { motion } from "framer-motion";
+import _ from "lodash";
+import React, { useRef, useState } from "react";
 import ReactMarkdown from "react-markdown";
 import UAParser from "ua-parser-js";
+
+let FadeIn: React.FC<React.PropsWithChildren> = ({ children }) => (
+  <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
+    {children}
+  </motion.div>
+);
 
 const INTRO = `
 **Summary:** This page is a 1-hour experiment by Brown University researchers 
@@ -13,17 +21,58 @@ We will use these results to inform the design of our
 **Compensation:** you will be compensated with a $20 Amazon gift card for completing
 this experiment. We will send you compensation after verifying you attempted the experiment 
 in good faith (e.g. did not leave everything blank).
-
-**Prerequisites:** you MUST have read [The Rust Programming Language](https://doc.rust-lang.org/book/),
-OR have equivalent knowledge of Rust from other sources. You do NOT need to be a Rust expert.
 `;
 
-export let Intro = ({ next }: { next: (email: string) => void }) => {
-  let [agreed, setAgreed] = useState(false);
+export let Prerequisites = ({ next }: { next: () => void }) => {
+  let prereqs = [
+    <>You MUST be 18 years or older.</>,
+    <>
+      You MUST have read{" "}
+      <a href="https://doc.rust-lang.org/book/">
+        The Rust Programming Language
+      </a>
+      , OR have equivalent knowledge of Rust from other sources. (You do not
+      need to be a Rust expert!)
+    </>,
+  ];
+  let ref = useRef<HTMLUListElement>(null);
+  let onChange = () => {
+    let inputs = Array.from(ref.current!.querySelectorAll("input"));
+    if (_.every(inputs, el => el.checked)) next();
+  };
+  return (
+    <>
+      <p>
+        <strong>Prerequisites:</strong> click the checkmark for each
+        prerequisite that you satisfy. If you do not satisfy all the
+        prerequisites, you cannot participate in this experiment.
+      </p>
+      <ul ref={ref} className="prerequisites">
+        {prereqs.map((el, i) => {
+          let name = `prereq${i}`;
+          return (
+            <li key={i}>
+              <input type="checkbox" id={name} onChange={onChange} />
+              <label htmlFor={name}>{el}</label>
+            </li>
+          );
+        })}
+      </ul>
+    </>
+  );
+};
+
+export let Intro = ({
+  next,
+}: {
+  next: (name: string, email: string) => void;
+}) => {
+  let [prereq, setPrereq] = useState(false);
+  let [consent, setConsent] = useState(false);
+  let [name, setName] = useState<string | undefined>();
   let [email, setEmail] = useState<string | undefined>();
 
   let userAgent = new UAParser(navigator.userAgent).getResult();
-  console.log(userAgent);
 
   let allowedBrowsers = ["Chrome", "Firefox"];
   let isBrave = "brave" in navigator;
@@ -65,37 +114,64 @@ export let Intro = ({ next }: { next: (email: string) => void }) => {
   return (
     <div className="container">
       <ReactMarkdown>{INTRO}</ReactMarkdown>
-      {!agreed ? (
-        <p>
-          <button
-            style={{ marginRight: "20px" }}
-            onClick={() => setAgreed(true)}
-          >
-            I understand and want to participate
-          </button>
-          <button onClick={() => alert("Please close this tab.")}>
-            I do not want to participate
-          </button>
-        </p>
-      ) : (
-        <>
+      <Prerequisites next={() => setPrereq(true)} />
+      {prereq ? (
+        <FadeIn>
           <p>
-            Please enter your email (we will send compensation here):
-            <br />
+            If you understand the instructions and want to participate in this
+            experiment, please provide consent by clicking the appropriate
+            button below.
+          </p>
+          <p>
+            <button
+              style={{ marginRight: "20px" }}
+              onClick={() => setConsent(true)}
+            >
+              I understand and want to participate
+            </button>
+            <button onClick={() => alert("Please close this tab.")}>
+              I do not want to participate
+            </button>
+          </p>
+        </FadeIn>
+      ) : null}
+      {consent ? (
+        <FadeIn>
+          <p>
+            To enable us to send you compensation after the experiment, please
+            enter your name and email below:
+          </p>
+          <p>
+            <label htmlFor="name">
+              <strong>Name: &nbsp;</strong>
+            </label>
             <input
-              type="email"
-              onChange={e => {
-                setEmail(e.target.value);
-              }}
+              type="text"
+              id="name"
+              onChange={e => setName(e.target.value)}
             />
           </p>
           <p>
-            <button disabled={!email} onClick={() => next(email!)}>
+            <label htmlFor="email">
+              <strong>Email: &nbsp;</strong>
+            </label>
+            <input
+              type="email"
+              id="email"
+              onChange={e => setEmail(e.target.value)}
+            />
+          </p>
+        </FadeIn>
+      ) : null}
+      {name && email ? (
+        <FadeIn>
+          <p>
+            <button disabled={!email} onClick={() => next(name!, email!)}>
               Submit
             </button>
           </p>
-        </>
-      )}
+        </FadeIn>
+      ) : null}
     </div>
   );
 };

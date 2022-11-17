@@ -2,7 +2,7 @@ import { RustAnalyzer } from "@wcrichto/rust-editor";
 import introJs from "intro.js";
 import React, { useEffect, useRef, useState } from "react";
 
-import { OverrideTimer, Problem } from "./problem";
+import { Problem } from "./problem";
 
 const SNIPPET = `
 /// Inserts the element 0 into the end of \`v\`.
@@ -22,7 +22,6 @@ export let Tutorial = ({
   let [started, setStarted] = useState(false);
   let [step, setStep] = useState(0);
   let [curTour, setCurTour] = useState<introJs.IntroJs | undefined>();
-  let [showTimer, setShowTimer] = useState(false);
 
   let makeTour = (steps: introJs.Step[]) => {
     if (curTour) curTour.exit();
@@ -45,6 +44,12 @@ export let Tutorial = ({
     tour.start();
 
     setCurTour(tour);
+
+    let intvl: NodeJS.Timer;
+    setTimeout(() => {
+      intvl = setInterval(() => tour.refresh(), 100);
+    }, 1000);
+    return () => clearInterval(intvl);
   };
 
   useEffect(() => {
@@ -55,7 +60,7 @@ export let Tutorial = ({
 
     if (step == 0) {
       let editor = part.querySelector(".editor")!;
-      let moreInfo = part.querySelector(".info-wrapper")!;
+      let moreInfo = part.querySelector(".more-info")!;
       let steps: introJs.Step[] = [
         {
           element: part,
@@ -78,11 +83,11 @@ export let Tutorial = ({
         },
         {
           element: part,
-          intro: `Try answering the problem. Write your answer in the blank, and click Submit.`,
+          intro: `Try answering the problem. Write your answer in the blank, and click <strong>Submit</strong>.`,
           position: "right",
         },
       ];
-      makeTour(steps);
+      return makeTour(steps);
     } else if (step == 1) {
       let steps: introJs.Step[] = [
         {
@@ -92,7 +97,7 @@ export let Tutorial = ({
           position: "left",
         },
       ];
-      makeTour(steps);
+      return makeTour(steps);
     } else if (step == 2) {
       let steps: introJs.Step[] = [
         {
@@ -102,9 +107,9 @@ export let Tutorial = ({
           position: "right",
         },
       ];
-      makeTour(steps);
+      return makeTour(steps);
     } else if (step == 3) {
-      let outputArea = part.querySelector(".output button")!;
+      let outputArea = part.querySelector(".output")!;
       let timer = parent.querySelector(".timer")!;
       let steps: introJs.Step[] = [
         {
@@ -122,7 +127,7 @@ export let Tutorial = ({
         {
           element: timer,
           intro:
-            "<p>Each task should take no more than 15 minutes. During the experiment, this notification will appear when you have 5 minutes left.</p><p>The experiment will not force you to the next task if you want to finish your response. This notification provides a guideline so you don't spend too much time on the experiment.</p>",
+            "Each task should take no more than 15 minutes. This box will track the time you've spent on each task. The experiment will not force you to the next task, but this box provides a guideline so you don't spend too much time on a task.",
           position: "bottom",
         },
         {
@@ -132,32 +137,30 @@ export let Tutorial = ({
           position: "left",
         },
       ];
-      makeTour(steps);
+      return makeTour(steps);
     }
   }, [started, step]);
 
   return (
-    <OverrideTimer.Provider value={showTimer}>
-      <div ref={ref}>
-        <p>
-          First, we're going to walk through a sample problem. Click this button
-          to get started:
-          <br />
-          <button onClick={() => setStarted(true)}>Start Tutorial</button>
-        </p>
-        {started ? (
-          <Problem
-            snippet={SNIPPET}
-            next={next}
-            ra={ra}
-            onStep={step => {
-              if (step == 3) setShowTimer(true);
-              if (step == 4) curTour!.exit();
-              setStep(step);
-            }}
-          />
-        ) : null}
-      </div>
-    </OverrideTimer.Provider>
+    <div ref={ref}>
+      <p>
+        First, we're going to walk through a sample problem. Click this button
+        to get started:
+      </p>
+      <p>
+        <button onClick={() => setStarted(true)}>Start Tutorial</button>
+      </p>
+      {started ? (
+        <Problem
+          snippet={SNIPPET}
+          next={next}
+          ra={ra}
+          onStep={step => {
+            if (step == 4) curTour!.exit();
+            setStep(step);
+          }}
+        />
+      ) : null}
+    </div>
   );
 };

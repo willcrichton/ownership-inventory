@@ -55,6 +55,7 @@ interface TaggedAnswer {
 
 interface ExperimentData {
   id: string;
+  name: string;
   email: string;
   answers: TaggedAnswer[];
 }
@@ -69,6 +70,7 @@ let App = () => {
     "start"
   );
   let [problem, setProblem] = useState(0);
+  let [name, setName] = useState<string | undefined>();
   let [email, setEmail] = useState<string | undefined>();
 
   let [ra, setRa] = useState<RustAnalyzer | undefined>();
@@ -91,6 +93,7 @@ let App = () => {
       let payload: Timed<ExperimentData> = {
         id,
         answers,
+        name: name!,
         email: email!,
         start,
         end: new Date().getTime(),
@@ -122,7 +125,8 @@ let App = () => {
       </div>
       {stage === "start" ? (
         <Intro
-          next={(email: string) => {
+          next={(name: string, email: string) => {
+            setName(name);
             setEmail(email);
             setStage("tutorial");
           }}
