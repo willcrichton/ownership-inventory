@@ -62,15 +62,16 @@ export let Prerequisites = ({ next }: { next: () => void }) => {
   );
 };
 
-export let Intro = ({
-  next,
-}: {
-  next: (name: string, email: string) => void;
-}) => {
+export interface Demographics {
+  name: string;
+  email: string;
+  yearsRust: string;
+}
+
+export let Intro = ({ next }: { next: (demo: Demographics) => void }) => {
   let [prereq, setPrereq] = useState(false);
   let [consent, setConsent] = useState(false);
-  let [name, setName] = useState<string | undefined>();
-  let [email, setEmail] = useState<string | undefined>();
+  let [demo, setDemo] = useState<Partial<Demographics>>({});
 
   let userAgent = new UAParser(navigator.userAgent).getResult();
 
@@ -125,11 +126,15 @@ export let Intro = ({
           <p>
             <button
               style={{ marginRight: "20px" }}
+              disabled={consent}
               onClick={() => setConsent(true)}
             >
               I understand and want to participate
             </button>
-            <button onClick={() => alert("Please close this tab.")}>
+            <button
+              disabled={consent}
+              onClick={() => alert("Please close this tab.")}
+            >
               I do not want to participate
             </button>
           </p>
@@ -148,7 +153,7 @@ export let Intro = ({
             <input
               type="text"
               id="name"
-              onChange={e => setName(e.target.value)}
+              onChange={e => setDemo({ ...demo, name: e.target.value })}
             />
           </p>
           <p>
@@ -158,16 +163,49 @@ export let Intro = ({
             <input
               type="email"
               id="email"
-              onChange={e => setEmail(e.target.value)}
+              onChange={e => setDemo({ ...demo, email: e.target.value })}
             />
           </p>
         </FadeIn>
       ) : null}
-      {name && email ? (
+      {demo.name && demo.email ? (
         <FadeIn>
           <p>
-            <button disabled={!email} onClick={() => next(name!, email!)}>
-              Submit
+            Please enter the number of years of experience you have with each
+            langauge below:
+          </p>
+          <table>
+            <tbody>
+              {[
+                ["yearsRust", "Rust"],
+                ["yearsC", "C"],
+                ["yearsCpp", "C++"],
+              ].map(([k, v]) => (
+                <tr key={k}>
+                  <td>
+                    <label htmlFor={k}>
+                      <strong>Years of experience with {v}: &nbsp;</strong>
+                    </label>
+                  </td>
+                  <td>
+                    <input
+                      type="number"
+                      min="0"
+                      id={k}
+                      onChange={e => setDemo({ ...demo, [k]: e.target.value })}
+                    />
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </FadeIn>
+      ) : null}
+      {demo.yearsRust ? (
+        <FadeIn>
+          <p>
+            <button onClick={() => next(demo as Demographics)}>
+              Proceed to experiment
             </button>
           </p>
         </FadeIn>

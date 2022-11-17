@@ -5,7 +5,7 @@ import ReactDOM from "react-dom/client";
 import * as uuid from "uuid";
 
 import "./index.scss";
-import { Intro } from "./intro";
+import { Demographics, Intro } from "./intro";
 import { Answer, Problem, Timed } from "./problem";
 import { problems as PROBLEMS } from "./problems.toml";
 import { Tutorial } from "./tutorial";
@@ -55,8 +55,7 @@ interface TaggedAnswer {
 
 interface ExperimentData {
   id: string;
-  name: string;
-  email: string;
+  demo: Demographics;
   answers: TaggedAnswer[];
 }
 
@@ -70,8 +69,7 @@ let App = () => {
     "start"
   );
   let [problem, setProblem] = useState(0);
-  let [name, setName] = useState<string | undefined>();
-  let [email, setEmail] = useState<string | undefined>();
+  let [demo, setDemo] = useState<Demographics | undefined>();
 
   let [ra, setRa] = useState<RustAnalyzer | undefined>();
   useEffect(() => {
@@ -93,8 +91,7 @@ let App = () => {
       let payload: Timed<ExperimentData> = {
         id,
         answers,
-        name: name!,
-        email: email!,
+        demo: demo!,
         start,
         end: new Date().getTime(),
       };
@@ -125,9 +122,8 @@ let App = () => {
       </div>
       {stage === "start" ? (
         <Intro
-          next={(name: string, email: string) => {
-            setName(name);
-            setEmail(email);
+          next={(demo: Demographics) => {
+            setDemo(demo);
             setStage("tutorial");
           }}
         />
