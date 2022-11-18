@@ -1,13 +1,18 @@
 import OMT from "@surma/rollup-plugin-off-main-thread";
 import react from "@vitejs/plugin-react";
-import esbuild from "esbuild";
+import * as cp from "child_process";
 import fs from "fs";
 import path from "path";
 import toml from "rollup-plugin-toml";
 import { defineConfig } from "vite";
 
+let commitHash = cp.execSync("git rev-parse HEAD").toString("utf-8").trim();
+
 export default defineConfig({
   base: "./",
+  define: {
+    COMMIT_HASH: JSON.stringify(commitHash),
+  },
   plugins: [
     OMT(),
     react(),

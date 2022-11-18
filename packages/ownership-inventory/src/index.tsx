@@ -10,17 +10,25 @@ import { Answer, Problem, Timed } from "./problem";
 import { problems as PROBLEMS } from "./problems.toml";
 import { Tutorial } from "./tutorial";
 
+declare global {
+  var COMMIT_HASH: string;
+}
+
+const SERVER_URL = `https://mindover.computer`;
+
+type SavedState = "unsaved" | "saved" | "error";
+
 let Outro = ({
   data,
   saved,
 }: {
   data: Timed<ExperimentData>;
-  saved: "unsaved" | "saved" | "error";
+  saved: SavedState;
 }) => {
   let textarea = useRef<HTMLTextAreaElement>(null);
   let [submitted, setSubmitted] = useState(false);
   let submit = () => {
-    fetch("https://mindover.computer/ownership-inventory-feedback", {
+    fetch(`${SERVER_URL}/ownership-inventory-feedback`, {
       headers: {
         "Content-Type": "application/json",
       },
@@ -97,6 +105,7 @@ interface TaggedAnswer {
 
 interface ExperimentData {
   id: string;
+  commitHash: string;
   demo: Demographics;
   answers: TaggedAnswer[];
 }
@@ -117,7 +126,7 @@ let App = () => {
   );
   let [problem, setProblem] = useState(0);
   let [demo, setDemo] = useState<Demographics | undefined>();
-  let [saved, setSaved] = useState<"unsaved" | "saved" | "error">("unsaved");
+  let [saved, setSaved] = useState<SavedState>("unsaved");
 
   let [ra, setRa] = useState<RustAnalyzer | undefined>();
   useEffect(() => {
@@ -136,6 +145,7 @@ let App = () => {
 
   let compileData = (): Timed<ExperimentData> => ({
     id,
+    commitHash: COMMIT_HASH,
     answers,
     demo: demo!,
     start,
@@ -149,7 +159,7 @@ let App = () => {
     });
 
     if (answers.length > 0) {
-      let promise = fetch("https://mindover.computer/ownership-inventory", {
+      let promise = fetch(`${SERVER_URL}/ownership-inventory`, {
         headers: {
           "Content-Type": "application/json",
         },
