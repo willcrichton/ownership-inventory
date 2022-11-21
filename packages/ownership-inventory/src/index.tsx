@@ -114,7 +114,7 @@ let App = () => {
   // let problems = useMemo(() => _.sampleSize(PROBLEMS, 3), []);
   let problems = useMemo(
     () =>
-      _.shuffle(["find_nth", "apply_curve", "add_displayable"]).map(
+      _.shuffle(["remove_zeros", "apply_curve", "add_displayable"]).map(
         name => _.find(PROBLEMS, { name })!
       ),
     []
