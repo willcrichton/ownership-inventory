@@ -112,8 +112,12 @@ interface ExperimentData {
 
 let App = () => {
   // let problems = useMemo(() => _.sampleSize(PROBLEMS, 3), []);
-  let problems = _.shuffle(["find_nth", "apply_curve", "add_displayable"]).map(
-    name => _.find(PROBLEMS, { name })!
+  let problems = useMemo(
+    () =>
+      _.shuffle(["find_nth", "apply_curve", "add_displayable"]).map(
+        name => _.find(PROBLEMS, { name })!
+      ),
+    []
   );
   let id = useMemo(() => uuid.v4(), []);
   let start = useMemo(() => new Date().getTime(), []);
@@ -171,8 +175,8 @@ let App = () => {
       }
     }
 
-    if (problem + 1 < problems.length) setProblem(problem + 1);
-    else setStage("end");
+    if (problem == problems.length - 1) setStage("end");
+    else setProblem(problem + 1);
   };
 
   return (

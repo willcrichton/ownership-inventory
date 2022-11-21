@@ -44,11 +44,12 @@ input[type=number] {
   position: relative;
 
   .timer {
-    position: absolute;
-    right: 10px;
-    top: -2.5em;
+    position: fixed;
+    right: 2em;
+    top: 1em;
     border: 1px solid #ccc;
     padding: 0.5em;
+    background: white;
 
     &.finished {
       color: red;
