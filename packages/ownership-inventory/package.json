@@ -31,10 +31,12 @@
     "lodash": "^4.17.21",
     "mobx": "^6.6.2",
     "mobx-react": "^7.5.3",
+    "monaco-editor": "^0.34.0",
     "normalize.css": "^8.0.1",
     "react-markdown": "^8.0.3",
     "rollup-plugin-toml": "^1.0.0",
     "tippy.js": "^6.3.7",
+    "typeit": "^8.7.0",
     "ua-parser-js": "^1.0.32",
     "uuid": "^9.0.0"
   }

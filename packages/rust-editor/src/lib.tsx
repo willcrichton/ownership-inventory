@@ -322,10 +322,11 @@ export class RustAnalyzer {
 export let Editor: React.FC<{
   ra?: RustAnalyzer;
   contents: string;
-  onChange?: (contents: string) => void;
   disabled?: boolean;
   exactHeight?: boolean;
-}> = ({ ra, contents, onChange, disabled, exactHeight }) => {
+  onChange?: (contents: string) => void;
+  onInit?: (editor: monaco.editor.IStandaloneCodeEditor) => void;
+}> = ({ ra, contents, disabled, exactHeight, onChange, onInit }) => {
   let ref = useRef<HTMLDivElement>(null);
   let model = useMemo(() => monaco.editor.createModel(contents, "rust"), []);
   let [editor, setEditor] = useState<
@@ -349,7 +350,7 @@ export let Editor: React.FC<{
     if (exactHeight) {
       height = editor.getTopForLineNumber(lineCount + 1) + lineHeight;
     } else {
-      let desiredCount = Math.max(lineCount, 8);
+      let desiredCount = Math.max(lineCount, 10);
       height = lineHeight * desiredCount;
     }
     ref.current!.style.height = `${height}px`;
@@ -368,6 +369,8 @@ export let Editor: React.FC<{
       });
       disposers.push(dispose.dispose);
     }
+
+    onInit && onInit(editor);
 
     return () => disposers.forEach(f => f());
   }, []);

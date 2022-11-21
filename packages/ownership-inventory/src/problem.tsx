@@ -153,6 +153,7 @@ export let Problem = ({
         </p>
         <p>
           <textarea
+            className="response"
             disabled={finished}
             placeholder={"Write your answer here..."}
             onChange={e => {
@@ -168,9 +169,9 @@ export let Problem = ({
           Assume that the compiler did NOT reject this function.{" "}
           <strong>
             What is a program that calls this function which would violate
-            memory safety or cause a data race?
+            memory safety or cause a data race? Explain your reasoning in a
+            comment.
           </strong>{" "}
-          Write your answer below.{" "}
           <MoreInfo>
             If no such program exists, then explain in a comment why the
             function is actually safe. If you are uncertain of a particular Rust
@@ -192,9 +193,10 @@ export let Problem = ({
         <p>
           <strong>
             How can this function be changed to pass the compiler while
-            preserving as much of its intent as possible?
+            preserving as much of its intent as possible? Justify your decisions
+            in a comment.
           </strong>{" "}
-          Write your answer below. You may use the{" "}
+          You may use the{" "}
           <a
             href="https://doc.rust-lang.org/std/"
             target="_blank"

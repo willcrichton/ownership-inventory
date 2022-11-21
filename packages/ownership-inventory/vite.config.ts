@@ -7,11 +7,17 @@ import toml from "rollup-plugin-toml";
 import { defineConfig } from "vite";
 
 let commitHash = cp.execSync("git rev-parse HEAD").toString("utf-8").trim();
+let serverUrl = process.argv.includes("--watch")
+  ? "https://localhost"
+  : "https://mindover.computer";
+let stage = process.env["STAGE"] || null;
 
 export default defineConfig({
   base: "./",
   define: {
     COMMIT_HASH: JSON.stringify(commitHash),
+    SERVER_URL: JSON.stringify(serverUrl),
+    STAGE: JSON.stringify(stage),
   },
   plugins: [
     OMT(),

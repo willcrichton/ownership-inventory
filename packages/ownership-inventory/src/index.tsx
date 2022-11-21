@@ -10,11 +10,13 @@ import { Answer, Problem, Timed } from "./problem";
 import { problems as PROBLEMS } from "./problems.toml";
 import { Tutorial } from "./tutorial";
 
+type Stage = "start" | "tutorial" | "problems" | "end";
+
 declare global {
   var COMMIT_HASH: string;
+  var SERVER_URL: string;
+  var STAGE: Stage | null;
 }
-
-const SERVER_URL = `https://mindover.computer`;
 
 type SavedState = "unsaved" | "saved" | "error";
 
@@ -123,9 +125,7 @@ let App = () => {
   let start = useMemo(() => new Date().getTime(), []);
   let answers = useMemo<TaggedAnswer[]>(() => [], []);
 
-  let [stage, setStage] = useState<"start" | "tutorial" | "problems" | "end">(
-    "start"
-  );
+  let [stage, setStage] = useState<Stage>(STAGE || "start");
   let [problem, setProblem] = useState(0);
   let [demo, setDemo] = useState<Demographics | undefined>();
   let [saved, setSaved] = useState<SavedState>("unsaved");

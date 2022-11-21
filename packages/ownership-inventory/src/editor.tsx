@@ -1,6 +1,7 @@
 import { Editor, RustAnalyzer } from "@wcrichto/rust-editor";
 import _ from "lodash";
-import React, { useState } from "react";
+import * as monaco from "monaco-editor/esm/vs/editor/editor.api";
+import React, { useContext, useState } from "react";
 
 import spinnerUrl from "./assets/spinner.gif";
 
@@ -38,11 +39,18 @@ export let scrollToBottom = () =>
     behavior: "smooth",
   });
 
-export let EditorBlock: typeof Editor = props => (
-  <div className="editor-wrapper">
-    <Editor {...props} />
-  </div>
-);
+export let EditorInstances = React.createContext<
+  monaco.editor.IStandaloneCodeEditor[]
+>([]);
+
+export let EditorBlock: typeof Editor = props => {
+  let insts = useContext(EditorInstances);
+  return (
+    <div className="editor-wrapper">
+      <Editor onInit={editor => insts.push(editor)} {...props} />
+    </div>
+  );
+};
 
 export let RunnableEditor = ({
   ra,
