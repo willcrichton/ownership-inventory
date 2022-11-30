@@ -113,6 +113,8 @@ interface ExperimentData {
 }
 
 let App = () => {
+  return <>This experiment has concluded and is not accepting more participants at this time.</>;
+  
   // let problems = useMemo(() => _.sampleSize(PROBLEMS, 3), []);
   let problems = useMemo(
     () =>
