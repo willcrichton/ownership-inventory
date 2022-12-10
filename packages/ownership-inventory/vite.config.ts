@@ -28,7 +28,6 @@ export default defineConfig({
       async writeBundle(options, bundle) {
         let outDir = options.dir!;
         [
-          "node_modules/coi-serviceworker/coi-serviceworker.js",
           "node_modules/@wcrichto/rust-editor/dist/editor.worker.js",
         ].forEach(f => {
           fs.copyFileSync(f, path.join(outDir, path.basename(f)));

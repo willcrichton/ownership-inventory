@@ -45,10 +45,8 @@ let fillInEditor = (
 
 export let Tutorial = ({
   next,
-  ra,
 }: {
   next: () => void;
-  ra?: RustAnalyzer;
 }) => {
   let ref = useRef<HTMLDivElement>(null);
   let [started, setStarted] = useState(false);
@@ -252,7 +250,6 @@ export let Tutorial = ({
           <Problem
             snippet={SNIPPET}
             next={next}
-            ra={ra}
             onStep={step => {
               if (step == 4) curTour!.exit();
               setStep(step);

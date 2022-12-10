@@ -80,11 +80,9 @@ let Timer = ({ start }: { start: number }) => {
 export let Problem = ({
   snippet,
   next,
-  ra,
   onStep,
 }: {
   snippet: string;
-  ra?: RustAnalyzer;
   next: (a: Timed<Answer>) => void;
   onStep?: (step: number) => void;
 }) => {
@@ -113,7 +111,6 @@ export let Problem = ({
           exactHeight={true}
           disabled={true}
           contents={snippet}
-          ra={!finished ? ra : undefined}
         />
         <p>
           <strong>
@@ -181,7 +178,6 @@ export let Problem = ({
         <EditorBlock
           contents={`fn main() {\n\n}`}
           disabled={finished}
-          ra={!finished ? ra : undefined}
           onChange={(s: any) => {
             answer.safetyViolation = s;
           }}
@@ -212,7 +208,6 @@ export let Problem = ({
           </MoreInfo>
         </p>
         <RunnableEditor
-          ra={ra}
           initialContents={snippet}
           onChange={s => {
             answer.functionFix = s;

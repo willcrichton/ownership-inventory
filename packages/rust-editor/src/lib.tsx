@@ -72,29 +72,31 @@ let globalSetup = () => {
     monaco.languages.setLanguageConfiguration("rust", conf);
     monaco.languages.setMonarchTokensProvider("rust", grammar);
   });
-
-  monaco.languages.register({
-    id: MODE_ID,
-  });
-
-  monaco.languages.onLanguage(MODE_ID, async () => {
-    monaco.languages.setLanguageConfiguration(MODE_ID, conf);
-    monaco.languages.setMonarchTokensProvider(MODE_ID, grammar);
-  });
 };
 
 globalSetup();
 
+let numRaInsts = 0;
+
 type WorkerProxy = { [method: string]: (...args: any[]) => Promise<any> };
 export class RustAnalyzer {
-  private constructor(readonly state: WorkerProxy) {}
+  private constructor(readonly id: string, readonly state: WorkerProxy) {
+    monaco.languages.register({ id });
+
+    monaco.languages.onLanguage(id, async () => {
+      monaco.languages.setLanguageConfiguration(id, conf);
+      monaco.languages.setMonarchTokensProvider(id, grammar);
+    });
+  }
 
   static async load() {
     console.debug("Creating Rust Analyzer web worker...");
     let state = await RustAnalyzer.createRA();
 
     console.debug("Initializing Rust Analyzer...");
-    let ra = new RustAnalyzer(state);
+    let ra = new RustAnalyzer(`rust-ra-${numRaInsts}`, state);
+    numRaInsts += 1;
+
     ra.registerRA();
     await ra.init();
 
@@ -109,7 +111,7 @@ export class RustAnalyzer {
   async update(model: monaco.editor.ITextModel) {
     console.debug("Updating Rust Analyzer...");
     const res = await this.state.update(model.getValue());
-    monaco.editor.setModelMarkers(model, MODE_ID, res.diagnostics);
+    monaco.editor.setModelMarkers(model, this.id, res.diagnostics);
   }
 
   private static async createRA(): Promise<WorkerProxy> {
@@ -163,10 +165,10 @@ export class RustAnalyzer {
 
   private registerRA() {
     let state = this.state;
-    monaco.languages.registerHoverProvider(MODE_ID, {
+    monaco.languages.registerHoverProvider(this.id, {
       provideHover: (_, pos) => this.state.hover(pos.lineNumber, pos.column),
     });
-    monaco.languages.registerCodeLensProvider(MODE_ID, {
+    monaco.languages.registerCodeLensProvider(this.id, {
       async provideCodeLenses(m) {
         const code_lenses = await state.code_lenses();
         const lenses = code_lenses.map(({ range, command }) => {
@@ -192,7 +194,7 @@ export class RustAnalyzer {
         return { lenses, dispose() {} };
       },
     });
-    monaco.languages.registerReferenceProvider(MODE_ID, {
+    monaco.languages.registerReferenceProvider(this.id, {
       async provideReferences(m, pos, { includeDeclaration }) {
         const references = await state.references(
           pos.lineNumber,
@@ -204,7 +206,7 @@ export class RustAnalyzer {
         }
       },
     });
-    monaco.languages.registerInlayHintsProvider(MODE_ID, {
+    monaco.languages.registerInlayHintsProvider(this.id, {
       async provideInlayHints(_model, _range, _token) {
         let hints = await state.inlay_hints();
         return hints.map(hint => {
@@ -232,12 +234,12 @@ export class RustAnalyzer {
         });
       },
     });
-    monaco.languages.registerDocumentHighlightProvider(MODE_ID, {
+    monaco.languages.registerDocumentHighlightProvider(this.id, {
       async provideDocumentHighlights(_, pos) {
         return await state.references(pos.lineNumber, pos.column, true);
       },
     });
-    monaco.languages.registerRenameProvider(MODE_ID, {
+    monaco.languages.registerRenameProvider(this.id, {
       async provideRenameEdits(m, pos, newName) {
         const edits = await state.rename(pos.lineNumber, pos.column, newName);
         if (edits) {
@@ -253,7 +255,7 @@ export class RustAnalyzer {
         return state.prepare_rename(pos.lineNumber, pos.column);
       },
     });
-    monaco.languages.registerCompletionItemProvider(MODE_ID, {
+    monaco.languages.registerCompletionItemProvider(this.id, {
       triggerCharacters: [".", ":", "="],
       async provideCompletionItems(_m, pos) {
         const suggestions = await state.completions(pos.lineNumber, pos.column);
@@ -262,7 +264,7 @@ export class RustAnalyzer {
         }
       },
     });
-    monaco.languages.registerSignatureHelpProvider(MODE_ID, {
+    monaco.languages.registerSignatureHelpProvider(this.id, {
       signatureHelpTriggerCharacters: ["(", ","],
       async provideSignatureHelp(_m, pos) {
         const value = await state.signature_help(pos.lineNumber, pos.column);
@@ -273,7 +275,7 @@ export class RustAnalyzer {
         };
       },
     });
-    monaco.languages.registerDefinitionProvider(MODE_ID, {
+    monaco.languages.registerDefinitionProvider(this.id, {
       async provideDefinition(m, pos) {
         const list = await state.definition(pos.lineNumber, pos.column);
         if (list) {
@@ -281,7 +283,7 @@ export class RustAnalyzer {
         }
       },
     });
-    monaco.languages.registerTypeDefinitionProvider(MODE_ID, {
+    monaco.languages.registerTypeDefinitionProvider(this.id, {
       async provideTypeDefinition(m, pos) {
         const list = await state.type_definition(pos.lineNumber, pos.column);
         if (list) {
@@ -289,7 +291,7 @@ export class RustAnalyzer {
         }
       },
     });
-    monaco.languages.registerImplementationProvider(MODE_ID, {
+    monaco.languages.registerImplementationProvider(this.id, {
       async provideImplementation(m, pos) {
         const list = await state.goto_implementation(
           pos.lineNumber,
@@ -300,18 +302,18 @@ export class RustAnalyzer {
         }
       },
     });
-    monaco.languages.registerDocumentSymbolProvider(MODE_ID, {
+    monaco.languages.registerDocumentSymbolProvider(this.id, {
       async provideDocumentSymbols() {
         return await state.document_symbols();
       },
     });
-    monaco.languages.registerOnTypeFormattingEditProvider(MODE_ID, {
+    monaco.languages.registerOnTypeFormattingEditProvider(this.id, {
       autoFormatTriggerCharacters: [".", "="],
       async provideOnTypeFormattingEdits(_, pos, ch) {
         return await state.type_formatting(pos.lineNumber, pos.column, ch);
       },
     });
-    monaco.languages.registerFoldingRangeProvider(MODE_ID, {
+    monaco.languages.registerFoldingRangeProvider(this.id, {
       async provideFoldingRanges() {
         return await state.folding_ranges();
       },
@@ -319,19 +321,56 @@ export class RustAnalyzer {
   }
 }
 
+let raInstances: { ra: RustAnalyzer; inUse: boolean }[] = [];
+
+export let preloadRaInstances = (n: number): Promise<void> =>
+  Promise.all(
+    [...Array(n).keys()].map(async () => {
+      let ra = await RustAnalyzer.load();
+      raInstances.push({ ra, inUse: false });
+    })
+  );
+
 export let Editor: React.FC<{
-  ra?: RustAnalyzer;
   contents: string;
   disabled?: boolean;
   exactHeight?: boolean;
   onChange?: (contents: string) => void;
   onInit?: (editor: monaco.editor.IStandaloneCodeEditor) => void;
-}> = ({ ra, contents, disabled, exactHeight, onChange, onInit }) => {
+}> = ({ contents, disabled, exactHeight, onChange, onInit }) => {
   let ref = useRef<HTMLDivElement>(null);
   let model = useMemo(() => monaco.editor.createModel(contents, "rust"), []);
   let [editor, setEditor] = useState<
     monaco.editor.IStandaloneCodeEditor | undefined
-  >(undefined);
+  >();
+
+  let [ra, setRa] = useState<RustAnalyzer | undefined>();
+  useEffect(() => {
+    let inst = raInstances.find(r => !r.inUse);
+    if (inst) {
+      console.log("Found existing RA instance");
+      inst.inUse = true;
+      setRa(inst.ra);
+      return () => {
+        inst.inUse = false;
+      };
+    } else {
+      console.log(
+        "Creating new RA instance, new total: ",
+        raInstances.length + 1
+      );
+      let idx;
+      RustAnalyzer.load().then(ra => {
+        idx = raInstances.length;
+        raInstances.push({ ra, inUse: true });
+        setRa(ra);
+      });
+      return () => {
+        if (idx === undefined) throw new Error("Unmounted editor before RA was loaded");
+        raInstances[idx].inUse = false;
+      };
+    }
+  }, []);
 
   useEffect(() => {
     let editor = monaco.editor.create(ref.current!, {
@@ -379,10 +418,9 @@ export let Editor: React.FC<{
     if (!ra) {
       monaco.editor.setModelLanguage(model, "rust");
       return;
-    } else {
-      monaco.editor.setModelLanguage(model, MODE_ID);
     }
 
+    monaco.editor.setModelLanguage(model, ra.id);
     ra.update(model);
     let dipose = model.onDidChangeContent(() => ra.update(model));
 

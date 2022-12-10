@@ -24,7 +24,6 @@
     "@types/ua-parser-js": "^0.7.36",
     "@types/uuid": "^8.3.4",
     "@wcrichto/rust-editor": "^0.0.1",
-    "coi-serviceworker": "^0.1.6",
     "file-saver": "^2.0.5",
     "framer-motion": "^7.6.6",
     "intro.js": "^6.0.0",

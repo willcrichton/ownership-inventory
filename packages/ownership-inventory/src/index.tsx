@@ -1,4 +1,4 @@
-import { RustAnalyzer } from "@wcrichto/rust-editor";
+import { RustAnalyzer, preloadRaInstances } from "@wcrichto/rust-editor";
 import _ from "lodash";
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import ReactDOM from "react-dom/client";
@@ -113,8 +113,8 @@ interface ExperimentData {
 }
 
 let App = () => {
-  return <>This experiment has concluded and is not accepting more participants at this time.</>;
-  
+  // return <>This experiment has concluded and is not accepting more participants at this time.</>;
+
   // let problems = useMemo(() => _.sampleSize(PROBLEMS, 3), []);
   let problems = useMemo(
     () =>
@@ -132,9 +132,8 @@ let App = () => {
   let [demo, setDemo] = useState<Demographics | undefined>();
   let [saved, setSaved] = useState<SavedState>("unsaved");
 
-  let [ra, setRa] = useState<RustAnalyzer | undefined>();
   useEffect(() => {
-    RustAnalyzer.load().then(setRa);
+    preloadRaInstances(3);
   }, []);
 
   useEffect(() => {
@@ -203,12 +202,11 @@ let App = () => {
           }}
         />
       ) : stage == "tutorial" ? (
-        <Tutorial ra={ra} next={() => setStage("problems")} />
+        <Tutorial next={() => setStage("problems")} />
       ) : stage == "problems" ? (
         <Problem
           key={problem}
           snippet={problems[problem].code.trim()}
-          ra={ra}
           next={onSubmitProblem}
         />
       ) : (

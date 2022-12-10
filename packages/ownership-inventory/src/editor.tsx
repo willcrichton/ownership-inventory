@@ -1,7 +1,7 @@
 import { Editor, RustAnalyzer } from "@wcrichto/rust-editor";
 import _ from "lodash";
 import * as monaco from "monaco-editor/esm/vs/editor/editor.api";
-import React, { useContext, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 
 import spinnerUrl from "./assets/spinner.gif";
 
@@ -45,6 +45,7 @@ export let EditorInstances = React.createContext<
 
 export let EditorBlock: typeof Editor = props => {
   let insts = useContext(EditorInstances);
+
   return (
     <div className="editor-wrapper">
       <Editor onInit={editor => insts.push(editor)} {...props} />
@@ -53,11 +54,9 @@ export let EditorBlock: typeof Editor = props => {
 };
 
 export let RunnableEditor = ({
-  ra,
   initialContents,
   onChange,
 }: {
-  ra?: RustAnalyzer;
   initialContents: string;
   onChange: (s: string) => void;
 }) => {
@@ -83,7 +82,6 @@ export let RunnableEditor = ({
           state.contents = c;
           onChange(c);
         }}
-        ra={ra}
       />
       <div className="output">
         <div>

@@ -6,9 +6,9 @@ import init, {
 const start = async () => {
   await init();
 
-  // Thread pool initialization with the given number of threads
-  // (pass `navigator.hardwareConcurrency` if you want to use all cores).
-  await initThreadPool(navigator.hardwareConcurrency);
+  // // Thread pool initialization with the given number of threads
+  // // (pass `navigator.hardwareConcurrency` if you want to use all cores).
+  // await initThreadPool(Math.min(2, navigator.hardwareConcurrency));
 
   const state = new WorldState();
 
