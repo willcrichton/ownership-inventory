@@ -2,9 +2,12 @@ from flask import Flask, render_template, request
 from flask_cors import CORS
 from pathlib import Path
 from pathvalidate import sanitize_filename
+import json
 
 app = Flask(__name__)
+app.config['MAX_CONTENT_LENGTH'] = 1 * 1000 * 1000 * 1000
 CORS(app)
+
 	
 @app.route('/upload', methods = ['POST'])
 def upload_file():
@@ -12,4 +15,32 @@ def upload_file():
     f = request.files[recording]
     f.save(Path('recordings') / sanitize_filename(recording))
     return 'file uploaded successfully'
+
+
+@app.route('/ownership-inventory', methods = ['POST'])
+def ownership_inventory():
+    with open('ownership-inventory.log', 'a+') as f:
+        json.dump(request.json, f)
+        f.write("\n")
+    return 'json uploaded successfully'
+
+
+@app.route('/ownership-inventory-feedback', methods = ['POST'])
+def ownership_inventory_feedback():
+    with open('ownership-inventory-feedback.log', 'a+') as f:
+        json.dump(request.json, f)
+        f.write("\n")
+    return 'json uploaded successfully'
+
 		
+@app.route('/trpl-evaluator', methods = ['POST'])
+def trpl_evaluator():
+    with open('trpl-evaluator.txt', 'a+') as f:
+        json.dump(request.json, f)
+        f.write("\n")
+    return 'json uploaded successfully'
+		
+
+@app.route('/ping', methods = ['GET'])
+def ping():
+    return 'ping'
