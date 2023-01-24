@@ -3,8 +3,6 @@ import OMT from "@surma/rollup-plugin-off-main-thread";
 import react from "@vitejs/plugin-react";
 import { generateAssets } from "@wcrichto/rust-editor/dist/build-utils.cjs";
 import * as cp from "child_process";
-import fs from "fs";
-import path from "path";
 import toml from "rollup-plugin-toml";
 import { defineConfig } from "vite";
 
@@ -13,7 +11,7 @@ let [serverUrl, telemetryUrl] = process.argv.includes("--watch")
   ? ["http://localhost:8000", "http://localhost"]
   : [
       "https://willcrichton.net/rust-experiments/ownership-inventory",
-      "https://api.willcrichton.net",
+      "https://rust-book.willcrichton.net/rust-experiments",
     ];
 let stage = process.env["STAGE"] || null;
 
