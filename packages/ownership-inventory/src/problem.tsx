@@ -1,4 +1,3 @@
-import { RustAnalyzer } from "@wcrichto/rust-editor";
 import { motion, useAnimation } from "framer-motion";
 import _ from "lodash";
 import React, { useEffect, useMemo, useState } from "react";
@@ -16,7 +15,9 @@ export interface Answer {
   errorExplanation: string;
   messageInterpretation: string;
   safetyViolation: string;
+  safetyViolationJustification: string;
   functionFix: string;
+  functionFixJustification: string;
 }
 
 let MoreInfo: React.FC<React.PropsWithChildren> = ({ children }) => {
@@ -77,6 +78,23 @@ let Timer = ({ start }: { start: number }) => {
   );
 };
 
+let ResponseArea = ({
+  finished,
+  onChange,
+}: {
+  finished: boolean;
+  onChange: (text: string) => void;
+}) => (
+  <textarea
+    className="response"
+    disabled={finished}
+    placeholder={"Write your answer here..."}
+    onChange={e => {
+      onChange(e.target.value);
+    }}
+  />
+);
+
 export let Problem = ({
   snippet,
   next,
@@ -100,18 +118,16 @@ export let Problem = ({
     errorExplanation: "",
     messageInterpretation: "",
     safetyViolation: "",
+    safetyViolationJustification: "",
     functionFix: "",
+    functionFixJustification: "",
   });
 
   let parts: ((finished: boolean) => React.ReactElement)[] = [
     finished => (
       <>
         <p>The following Rust function is rejected by the Rust compiler.</p>
-        <EditorBlock
-          exactHeight={true}
-          disabled={true}
-          contents={snippet}
-        />
+        <EditorBlock exactHeight={true} disabled={true} contents={snippet} />
         <p>
           <strong>
             What error message would you expect from the compiler?
@@ -124,13 +140,9 @@ export let Problem = ({
           </MoreInfo>
         </p>
         <p>
-          <textarea
-            className="response"
-            disabled={finished}
-            placeholder={"Write your answer here..."}
-            onChange={e => {
-              answer.errorExplanation = e.target.value;
-            }}
+          <ResponseArea
+            finished={finished}
+            onChange={s => (answer.errorExplanation = s)}
           />
         </p>
       </>
@@ -149,13 +161,9 @@ export let Problem = ({
           </MoreInfo>
         </p>
         <p>
-          <textarea
-            className="response"
-            disabled={finished}
-            placeholder={"Write your answer here..."}
-            onChange={e => {
-              answer.messageInterpretation = e.target.value;
-            }}
+          <ResponseArea
+            finished={finished}
+            onChange={s => (answer.messageInterpretation = s)}
           />
         </p>
       </>
@@ -166,12 +174,11 @@ export let Problem = ({
           Assume that the compiler did NOT reject this function.{" "}
           <strong>
             What is a program that calls this function which would violate
-            memory safety or cause a data race? Explain your reasoning in a
-            comment.
+            memory safety or cause a data race?
           </strong>{" "}
           <MoreInfo>
-            If no such program exists, then explain in a comment why the
-            function is actually safe. If you are uncertain of a particular Rust
+            If no such program exists, then leave this field blank and explain
+            you reasoning below. If you are uncertain of a particular Rust
             syntax, you may use pseudocode notation.
           </MoreInfo>
         </p>
@@ -182,15 +189,25 @@ export let Problem = ({
             answer.safetyViolation = s;
           }}
         />
+        <p>
+          In a few sentences,{" "}
+          <strong>
+            explain why you believe your program will violate memory safety or
+            cause a data race, or why it is impossible to write such a program.
+          </strong>
+        </p>
+        <ResponseArea
+          finished={finished}
+          onChange={s => (answer.safetyViolationJustification = s)}
+        />
       </>
     ),
-    _ => (
+    finished => (
       <>
         <p>
           <strong>
-            How can this function be changed to pass the compiler while
-            preserving as much of its intent as possible? Justify your decisions
-            in a comment.
+            How can this function be changed to pass the compiler while (1)
+            preserving its intent and (2) reducing runtime performance?
           </strong>{" "}
           You may use the{" "}
           <a
@@ -212,6 +229,14 @@ export let Problem = ({
           onChange={s => {
             answer.functionFix = s;
           }}
+        />
+        <p>
+          In a few sentences,{" "}
+          <strong>explain why your fix satisfies the criteria above.</strong>
+        </p>
+        <ResponseArea
+          finished={finished}
+          onChange={s => (answer.functionFixJustification = s)}
         />
       </>
     ),

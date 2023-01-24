@@ -1,4 +1,4 @@
-import { RustAnalyzer, preloadRaInstances } from "@wcrichto/rust-editor";
+import { raSetup } from "@wcrichto/rust-editor";
 import _ from "lodash";
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import ReactDOM from "react-dom/client";
@@ -14,7 +14,7 @@ type Stage = "start" | "tutorial" | "problems" | "end";
 
 declare global {
   var COMMIT_HASH: string;
-  var SERVER_URL: string;
+  var TELEMETRY_URL: string;
   var STAGE: Stage | null;
 }
 
@@ -30,7 +30,7 @@ let Outro = ({
   let textarea = useRef<HTMLTextAreaElement>(null);
   let [submitted, setSubmitted] = useState(false);
   let submit = () => {
-    fetch(`${SERVER_URL}/ownership-inventory-feedback`, {
+    fetch(`${TELEMETRY_URL}/ownership-inventory-feedback`, {
       headers: {
         "Content-Type": "application/json",
       },
@@ -115,14 +115,15 @@ interface ExperimentData {
 let App = () => {
   // return <>This experiment has concluded and is not accepting more participants at this time.</>;
 
-  // let problems = useMemo(() => _.sampleSize(PROBLEMS, 3), []);
-  let problems = useMemo(
-    () =>
-      _.shuffle(["get_or_default", "concat_all", "reverse", "find_nth"]).map(
-        name => _.find(PROBLEMS, { name })!
-      ),
-    []
-  );
+  let problems = useMemo(() => _.sampleSize(PROBLEMS, 3), []);
+  // let problems = useMemo(
+  //   () =>
+  //     _.shuffle(["get_or_default", "concat_all", "reverse", "find_nth"]).map(
+  //       name => _.find(PROBLEMS, { name })!
+  //     ),
+  //   []
+  // );
+  
   let id = useMemo(() => uuid.v4(), []);
   let start = useMemo(() => new Date().getTime(), []);
   let answers = useMemo<TaggedAnswer[]>(() => [], []);
@@ -131,10 +132,6 @@ let App = () => {
   let [problem, setProblem] = useState(0);
   let [demo, setDemo] = useState<Demographics | undefined>();
   let [saved, setSaved] = useState<SavedState>("unsaved");
-
-  useEffect(() => {
-    preloadRaInstances(3);
-  }, []);
 
   useEffect(() => {
     if (stage != "start" && stage != "end") {
@@ -162,7 +159,7 @@ let App = () => {
     });
 
     if (answers.length > 0) {
-      let promise = fetch(`${SERVER_URL}/ownership-inventory`, {
+      let promise = fetch(`${TELEMETRY_URL}/ownership-inventory`, {
         headers: {
           "Content-Type": "application/json",
         },
@@ -216,6 +213,7 @@ let App = () => {
   );
 };
 
+raSetup(".");
 ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
   <App />
 );

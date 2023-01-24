@@ -163,22 +163,22 @@ export let Tutorial = ({
       ];
       return makeTour(steps);
     } else if (step == 2) {
+      let response = part.querySelector<HTMLTextAreaElement>(".response")!;
       let steps: Step[] = [
         {
           element: part,
           intro:
             "For Part 3, you will be asked to write Rust code. The code viewer is editable, and you can write your answer there. Click Next to see one possible answer.",
           position,
-          onClick: () => {
+          onClick: async () => {
             editors[1].setSelection(new monaco.Selection(2, 2, 2, 2));
             let answer = `  let v = vec![1, 2, 3];
   let x = &v[0];
   add_zero(&v);
-  println!("{x}");
-  // Calling add_zero may cause v to reallocate its contents,
-  // which causes x to point to deallocated memory.
-  // Reading x in the println therefore violates memory safety.`;
-            fillInEditor(editors[1], answer);
+  println!("{x}");`;
+            await fillInEditor(editors[1], answer);
+            let justification = `Calling add_zero may cause v to reallocate its contents, which causes x to point to deallocated memory. Reading x in the println therefore violates memory safety.`;
+            fillIn(response, justification);
           },
         },
         {
@@ -191,6 +191,7 @@ export let Tutorial = ({
     } else if (step == 3) {
       let outputArea = part.querySelector(".output")!;
       let timer = parent.querySelector(".timer")!;
+      let response = part.querySelector<HTMLTextAreaElement>(".response")!;
       let steps: Step[] = [
         {
           element: part,
@@ -219,10 +220,7 @@ export let Tutorial = ({
             editor.setSelection(new monaco.Selection(2, 17, 2, 17));
             await fillInEditor(editor, "mut ");
 
-            editor.setSelection(new monaco.Selection(2, 80, 2, 80));
-            let explanation = ` \n  // This function needs to change v, so we should follow
-  // the compiler's suggestion and change & to &mut.`;
-            fillInEditor(editor, explanation);
+            fillIn(response, "This function needs to change v, so we should follow the compiler's suggestion and change & to &mut.");
           },
         },
         {

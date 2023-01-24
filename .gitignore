@@ -29,3 +29,7 @@ pnpm-workspace.yaml
 .eslintrc.cjs
 .prettierrc.cjs
 jest.config.cjs
+# Managed by Graco
+pnpm-workspace.yaml
+.eslintrc.cjs
+.prettierrc.cjs

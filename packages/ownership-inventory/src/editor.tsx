@@ -1,7 +1,7 @@
-import { Editor, RustAnalyzer } from "@wcrichto/rust-editor";
+import { Editor } from "@wcrichto/rust-editor";
 import _ from "lodash";
 import * as monaco from "monaco-editor/esm/vs/editor/editor.api";
-import React, { useContext, useEffect, useState } from "react";
+import React, { useContext, useState } from "react";
 
 import spinnerUrl from "./assets/spinner.gif";
 
