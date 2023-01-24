@@ -123,7 +123,7 @@ let App = () => {
   //     ),
   //   []
   // );
-  
+
   let id = useMemo(() => uuid.v4(), []);
   let start = useMemo(() => new Date().getTime(), []);
   let answers = useMemo<TaggedAnswer[]>(() => [], []);

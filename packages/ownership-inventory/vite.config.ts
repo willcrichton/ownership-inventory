@@ -1,3 +1,4 @@
+//@ts-nocheck
 import OMT from "@surma/rollup-plugin-off-main-thread";
 import react from "@vitejs/plugin-react";
 import { generateAssets } from "@wcrichto/rust-editor/dist/build-utils.cjs";
@@ -11,7 +12,7 @@ let commitHash = cp.execSync("git rev-parse HEAD").toString("utf-8").trim();
 let [serverUrl, telemetryUrl] = process.argv.includes("--watch")
   ? ["http://localhost:8000", "http://localhost"]
   : [
-      "https://willcrichton.net/ownership-inventory",
+      "https://willcrichton.net/rust-experiments/ownership-inventory",
       "https://api.willcrichton.net",
     ];
 let stage = process.env["STAGE"] || null;

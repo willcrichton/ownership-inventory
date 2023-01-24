@@ -1,4 +1,3 @@
-import { RustAnalyzer } from "@wcrichto/rust-editor";
 import introJs from "intro.js";
 import * as monaco from "monaco-editor/esm/vs/editor/editor.api";
 import React, { useEffect, useMemo, useRef, useState } from "react";
@@ -43,11 +42,7 @@ let fillInEditor = (
     }, TYPING_SPEED_MS);
   });
 
-export let Tutorial = ({
-  next,
-}: {
-  next: () => void;
-}) => {
+export let Tutorial = ({ next }: { next: () => void }) => {
   let ref = useRef<HTMLDivElement>(null);
   let [started, setStarted] = useState(false);
   let [step, setStep] = useState(0);
@@ -220,7 +215,10 @@ export let Tutorial = ({
             editor.setSelection(new monaco.Selection(2, 17, 2, 17));
             await fillInEditor(editor, "mut ");
 
-            fillIn(response, "This function needs to change v, so we should follow the compiler's suggestion and change & to &mut.");
+            fillIn(
+              response,
+              "This function needs to change v, so we should follow the compiler's suggestion and change & to &mut."
+            );
           },
         },
         {
