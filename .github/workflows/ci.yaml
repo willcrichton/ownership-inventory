@@ -5,12 +5,9 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
-      - uses: pnpm/action-setup@v2
+      - uses: actions/checkout@v2      
       - run: |
-          git clone https://github.com/willcrichton/graco/
-          cd graco && pnpm install && pnpm build && pnpm link --global
-          cd ..          
+          npm i -g graco
           NODE_OPTIONS='--max-old-space-size=3584' graco prepare
           mkdir dist
           mv packages/ownership-inventory/dist dist/ownership-inventory
