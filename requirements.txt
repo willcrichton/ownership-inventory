@@ -1,0 +1,8 @@
+# For notebooks
+jupyter
+
+# For server
+flask
+flask-cors
+pathvalidate
+gunicorn

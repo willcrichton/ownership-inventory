@@ -113,9 +113,9 @@ interface ExperimentData {
 }
 
 let App = () => {
-  // return <>This experiment has concluded and is not accepting more participants at this time.</>;
-
-  let problems = useMemo(() => _.sampleSize(PROBLEMS, 3), []);
+  let [experimentOver, setExperimentOver] = useState<boolean | undefined>();
+  let [problems, setProblems] = useState<any[]>([]);
+  // let problems = useMemo(() => _.sampleSize(PROBLEMS, 1), []);
   // let problems = useMemo(
   //   () =>
   //     _.shuffle(["get_or_default", "concat_all", "reverse", "find_nth"]).map(
@@ -123,6 +123,25 @@ let App = () => {
   //     ),
   //   []
   // );
+  useEffect(() => {
+    fetch(`${TELEMETRY_URL}/ownership-inventory-setup`, {
+      method: "GET",
+      mode: "cors",
+    })
+      .then(async response => {
+        let data = await response.json();
+        if (data.finished) setExperimentOver(experimentOver);
+        else {
+          setExperimentOver(false);
+          setProblems(
+            data.problems.map((name: string) => _.find(PROBLEMS, { name })!)
+          );
+        }
+      })
+      .catch(() => {
+        setExperimentOver(TELEMETRY_URL != "http://localhost");
+      });
+  }, []);
 
   let id = useMemo(() => uuid.v4(), []);
   let start = useMemo(() => new Date().getTime(), []);
@@ -191,7 +210,12 @@ let App = () => {
           ) : null}
         </h1>
       </div>
-      {stage === "start" ? (
+      {experimentOver === undefined ? null : experimentOver === true ? (
+        <>
+          This experiment has concluded and is not accepting more participants
+          at this time.
+        </>
+      ) : stage === "start" ? (
         <Intro
           next={(demo: Demographics) => {
             setDemo(demo);
