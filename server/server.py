@@ -44,3 +44,6 @@ def trpl_evaluator():
 @app.route('/ping', methods = ['GET'])
 def ping():
     return 'ping'
+
+if __name__ == "__main__":
+    app.run()
