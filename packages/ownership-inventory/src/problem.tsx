@@ -173,7 +173,7 @@ export let Problem = ({
         <p>
           Assume that the compiler did NOT reject this function.{" "}
           <strong>
-            What is a program that calls this function which would violate
+            3A: What is a program that calls this function which would violate
             memory safety or cause a data race?
           </strong>{" "}
           <MoreInfo>
@@ -190,10 +190,10 @@ export let Problem = ({
           }}
         />
         <p>
-          In a few sentences,{" "}
           <strong>
-            explain why you believe your program will violate memory safety or
-            cause a data race, or why it is impossible to write such a program.
+            3B: In a few sentences, explain why you believe your program will
+            violate memory safety or cause a data race, or why it is impossible
+            to write such a program.
           </strong>
         </p>
         <ResponseArea
@@ -206,7 +206,7 @@ export let Problem = ({
       <>
         <p>
           <strong>
-            How can this function be changed to pass the compiler while (1)
+            4A: How can this function be changed to pass the compiler while (1)
             preserving its intent and (2) reducing runtime performance?
           </strong>{" "}
           You may use the{" "}
@@ -231,8 +231,10 @@ export let Problem = ({
           }}
         />
         <p>
-          In a few sentences,{" "}
-          <strong>explain why your fix satisfies the criteria above.</strong>
+          <strong>
+            4B: In a few sentences, explain why your fix satisfies the criteria
+            above.
+          </strong>
         </p>
         <ResponseArea
           finished={finished}
